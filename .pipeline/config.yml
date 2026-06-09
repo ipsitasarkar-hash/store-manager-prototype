@@ -1,0 +1,67 @@
+general:
+  buildTool: 'docker'
+  artifactType: helm
+  nativeBuild: true
+  productiveBranch: 'main'
+  pipelineOptimization: true
+  repository: 'engagement-layer'
+  owner: 'InvoiceCapture'
+  nativeVoting: true
+  vaultPath: 'piper/PIPELINE-GROUP-6811'
+  vaultBasePath: 'piper/PIPELINE-GROUP-6811'
+  vaultPipelineName: 'PIPELINE-52332'
+  vaultServerUrl: 'https://vault.tools.sap'
+  vaultNamespace: 'ies/hyperspace/pipelines'
+  projectName: engagement-layer
+  versioningType: cloud
+  manualConfirmation: false
+  vaultCredentialPath: 'common-repository'
+  vaultCredentialKeys: [ 'username', 'artifactoryToken', 'auth' ]
+stages:
+  Build:
+    kanikoExecute: true
+    helmExecute: true
+  Acceptance:
+    sapDownloadArtifact: false
+  Performance:
+    sapDownloadArtifact: false
+  Release:
+    sapDownloadArtifact: true
+steps:
+  artifactPrepareVersion:
+    gitHttpsCredentialVaultSecretName: 'GROUP-SECRETS/github-tools-cobalt-serviceuser'
+    shortCommitId: true
+    additionalTargetTools:
+      - helm
+    additionalTargetDescriptors:
+      - "**/Chart.yaml"
+  sapCallStagingService:
+    url: 'https://staging.repositories.cloud.sap/stage/api'
+    profile: 'group-6811-default'
+  kanikoExecute:
+    containerImageName: invoicecapture/engagement-layer-native
+    containerRegistryUrl: https://ariba-distribution.common.repositories.cloud.sap
+  helmExecute:
+    chartPath: helm
+    dependency: build
+    templateStartDelimiter: "[["
+    templateEndDelimiter: "]]"
+    sourceRepositoryName: unified-runtime-helm
+    sourceRepositoryURL: https://common.repositories.cloud.sap/artifactory/unified-runtime-helm
+    targetRepositoryName: ariba-k8s
+    targetRepositoryURL: https://common.repositories.cloud.sap/artifactory/ariba-k8s/invoicecapture/engagement-layer
+  sapCumulusUpload:
+    pipelineId: 'eea0b581-ec7b-41d7-afad-2529c77bf706'
+  sapDwCStageRelease:
+    promotedDockerImage: ariba-distribution.common.repositories.cloud.sap/invoicecapture/engagement-layer-native
+    overwriteHelmDockerImage: false
+    uploadType: 'service'
+    dwcProjectName: invcap
+    helmDeployParameters: >-
+      -f helm/values.yaml
+    apps:
+      - name: eng-layer
+        noEuporieTaskCollection: true
+  sapDownloadArtifact:
+    extractPackage: true
+    targetPath: helm

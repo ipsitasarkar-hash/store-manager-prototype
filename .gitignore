@@ -1,0 +1,30 @@
+# macOS
+.DS_Store
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+
+# Vite cache
+.vite/
+
+# Playwright
+.playwright-mcp/
+test-results/
+playwright-report/
+
+# Helm
+helm/charts/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+

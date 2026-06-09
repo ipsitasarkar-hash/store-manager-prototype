@@ -1,0 +1,15 @@
+apiVersion: v2
+name: engagement-layer
+description: Engagement Layer for Invoice Capture.
+type: application
+version: 1.0.0
+appVersion: 1.0.0
+
+annotations:
+  app.kubernetes.io/managed-by: cds-dk/helm
+
+dependencies:
+  - name: web-application
+    alias: engagement-layer
+    version: ">0.0.0"
+    repository: https://common.repositories.cloud.sap/artifactory/unified-runtime-helm/

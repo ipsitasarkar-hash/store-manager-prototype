@@ -1,0 +1,224 @@
+/**
+ * EL-Design System — Design Tokens
+ * Extracted from FX UI Kit Invoicing (Figma)
+ * Theme: Sapphire (Light / Dark modes)
+ */
+
+:root {
+  /* ===========================
+   * FOUNDATION COLORS
+   * =========================== */
+
+  /* Blues */
+  --el-blue-50: 195 100% 96%;    /* #EBF8FF */
+  --el-blue-100: 198 100% 91%;   /* #D1EFFF */
+  --el-blue-200: 203 100% 83%;   /* #A6E0FF */
+  --el-blue-300: 205 100% 77%;   /* #89D1FF */
+  --el-blue-400: 210 100% 65%;   /* #4DB1FF */
+  --el-blue-500: 215 100% 55%;   /* #1B90FF */
+  --el-blue-600: 212 100% 47%;   /* #0070F2 — Brand Blue Base */
+  --el-blue-700: 215 100% 41%;   /* #0057D2 */
+  --el-blue-800: 218 100% 35%;   /* #0040B0 */
+  --el-blue-900: 221 100% 26%;   /* #002A86 */
+  --el-blue-950: 226 100% 15%;   /* #00144A */
+
+  /* Purples */
+  --el-purple-50: 255 100% 96%;  /* #F1ECFF */
+  --el-purple-100: 255 100% 93%; /* #E3D8FF */
+  --el-purple-200: 261 100% 86%; /* #D3B6FF */
+  --el-purple-300: 264 100% 80%; /* #B894FF */
+  --el-purple-400: 267 100% 73%; /* #9B76FF */
+  --el-purple-500: 269 100% 66%; /* #7858FF */
+  --el-purple-600: 252 100% 61%; /* #5D36FF — Joule/Assistant Base */
+  --el-purple-700: 258 93% 49%;  /* #470CED */
+  --el-purple-800: 262 80% 38%;  /* #2C13AD */
+  --el-purple-900: 264 80% 24%;  /* #1C0C6E */
+  --el-purple-950: 264 80% 12%;  /* #0E0637 */
+
+  /* Neutrals */
+  --el-neutral-white: 0 0% 100%;
+  --el-neutral-50: 216 100% 99%; /* #FDFE FF — near white */
+  --el-neutral-50-alt: 210 9% 96%; /* #F8F9FA */
+  --el-neutral-100: 213 14% 94%; /* #F0F2F4 */
+  --el-neutral-200: 225 6% 91%;  /* #E6E7EA */
+  --el-neutral-300: 217 13% 75%; /* #B5BCCA */
+  --el-neutral-400: 217 12% 55%; /* #7C879C */
+  --el-neutral-500: 218 14% 45%; /* #636D83 */
+  --el-neutral-600: 222 16% 25%; /* #353C4A */
+  --el-neutral-700: 222 22% 17%; /* #222937 */
+  --el-neutral-800: 222 24% 13%; /* #191F2B */
+  --el-neutral-900: 222 28% 10%; /* #131721 */
+  --el-neutral-950: 222 29% 7%;  /* #0D1017 */
+  --el-neutral-black: 0 0% 0%;
+
+  /* Greens (Success) */
+  --el-green-50: 140 52% 95%;
+  --el-green-100: 140 48% 88%;
+  --el-green-200: 140 46% 72%;
+  --el-green-300: 140 44% 56%;
+  --el-green-400: 140 46% 44%;
+  --el-green-500: 136 49% 38%;   /* #30914C — Success Base */
+  --el-green-600: 136 50% 29%;   /* #256F3A */
+  --el-green-700: 136 52% 22%;
+  --el-green-800: 136 54% 16%;
+  --el-green-900: 136 56% 10%;
+
+  /* Reds (Error/Destructive) */
+  --el-red-50: 0 100% 96%;
+  --el-red-100: 0 100% 90%;
+  --el-red-200: 0 96% 80%;
+  --el-red-300: 0 94% 68%;
+  --el-red-400: 0 92% 58%;
+  --el-red-500: 0 91% 48%;       /* #E90B0B — Error Base */
+  --el-red-600: 0 88% 40%;
+  --el-red-700: 0 86% 32%;
+  --el-red-800: 0 84% 24%;
+  --el-red-900: 0 82% 16%;
+
+  /* Oranges (Warning/Critical) */
+  --el-orange-50: 30 100% 95%;
+  --el-orange-100: 28 100% 88%;
+  --el-orange-200: 27 100% 76%;
+  --el-orange-300: 26 100% 64%;
+  --el-orange-400: 26 100% 52%;
+  --el-orange-500: 26 100% 45%;  /* #E76500 — Warning Base */
+  --el-orange-600: 24 100% 38%;
+  --el-orange-700: 22 100% 30%;
+  --el-orange-800: 20 100% 22%;
+  --el-orange-900: 18 100% 14%;
+
+  /* ===========================
+   * SEMANTIC TOKENS (Light)
+   * =========================== */
+
+  /* Surfaces */
+  --el-background: var(--el-neutral-50);
+  --el-background-alt: var(--el-neutral-50-alt);
+  --el-surface: var(--el-neutral-white);
+  --el-surface-elevated: var(--el-neutral-white);
+
+  /* Text */
+  --el-foreground: 210 37% 12%;        /* #131E29 — sapTextColor */
+  --el-foreground-muted: 211 21% 42%;  /* #556B82 — sapContent_LabelColor */
+  --el-foreground-subtle: var(--el-neutral-400);
+
+  /* Brand */
+  --el-brand: var(--el-blue-600);
+  --el-brand-foreground: var(--el-neutral-white);
+  --el-brand-hover: var(--el-blue-700);
+  --el-brand-pressed: var(--el-blue-800);
+  --el-brand-selected: 213 38% 93%;    /* #E5ECFA — Blue-Selected */
+
+  /* Joule / AI Assistant */
+  --el-joule: var(--el-purple-600);
+  --el-joule-foreground: var(--el-neutral-white);
+  --el-joule-hover: var(--el-purple-700);
+  --el-joule-pressed: var(--el-purple-800);
+  --el-joule-surface: var(--el-purple-50);
+  --el-joule-border: 252 30% 88%;
+
+  /* Semantic status */
+  --el-success: var(--el-green-500);
+  --el-success-foreground: var(--el-neutral-white);
+  --el-success-surface: var(--el-green-50);
+
+  --el-warning: var(--el-orange-500);
+  --el-warning-foreground: var(--el-neutral-white);
+  --el-warning-surface: var(--el-orange-50);
+
+  --el-error: var(--el-red-500);
+  --el-error-foreground: var(--el-neutral-white);
+  --el-error-surface: var(--el-red-50);
+
+  --el-info: var(--el-blue-600);
+  --el-info-foreground: var(--el-neutral-white);
+  --el-info-surface: var(--el-blue-50);
+
+  /* Borders */
+  --el-border: 0 0% 85%;              /* #D9D9D9 — sapGroup_ContentBorderColor */
+  --el-border-strong: 211 20% 42%;    /* #556B81 — sapField_BorderColor */
+  --el-border-focus: var(--el-blue-600);
+
+  /* Ring */
+  --el-ring: var(--el-blue-600);
+
+  /* Icons */
+  --el-icon-primary: var(--el-neutral-700);
+  --el-icon-muted: var(--el-neutral-400);
+
+  /* ===========================
+   * SPACING (SAP Horizon)
+   * =========================== */
+  --el-space-0: 0px;
+  --el-space-1: 0.25rem;  /* 4px */
+  --el-space-2: 0.5rem;   /* 8px — tiny */
+  --el-space-3: 0.75rem;  /* 12px */
+  --el-space-4: 1rem;     /* 16px — small */
+  --el-space-5: 1.25rem;  /* 20px — medium */
+  --el-space-6: 1.5rem;   /* 24px — large */
+  --el-space-8: 2rem;     /* 32px — xl */
+  --el-space-10: 2.5rem;  /* 40px */
+  --el-space-12: 3rem;    /* 48px — xxl */
+
+  /* ===========================
+   * RADII (SAP Horizon)
+   * =========================== */
+  --el-radius-none: 0px;
+  --el-radius-xs: 0.25rem;   /* 4px — sapField */
+  --el-radius-sm: 0.5rem;    /* 8px — sapButton */
+  --el-radius-md: 0.75rem;   /* 12px — sapElement */
+  --el-radius-lg: 1rem;      /* 16px — sapTile */
+  --el-radius-xl: 1.25rem;   /* 20px */
+  --el-radius-2xl: 1.5rem;   /* 24px */
+  --el-radius-3xl: 2rem;     /* 32px */
+  --el-radius-full: 9999px;
+
+  /* ===========================
+   * TYPOGRAPHY
+   * =========================== */
+  --el-font-family: "72", "72full", Arial, Helvetica, sans-serif;
+  --el-font-size-xs: 0.75rem;     /* 12px */
+  --el-font-size-sm: 0.875rem;    /* 14px — sapFontSize (base) */
+  --el-font-size-base: 1rem;      /* 16px — sapFontLargeSize */
+  --el-font-size-lg: 1.125rem;    /* 18px */
+  --el-font-size-xl: 1.25rem;     /* 20px */
+  --el-font-size-2xl: 1.5rem;     /* 24px — sapFontHeader3Size */
+  --el-font-size-3xl: 2rem;       /* 32px */
+
+  --el-line-height-tight: 1.25;
+  --el-line-height-normal: 1.5;
+  --el-line-height-relaxed: 1.75;
+
+  --el-font-weight-regular: 400;
+  --el-font-weight-medium: 500;
+  --el-font-weight-semibold: 600;
+  --el-font-weight-bold: 700;
+
+  /* ===========================
+   * SHADOWS (SAP Horizon)
+   * =========================== */
+  --el-shadow-sm: 0 1px 2px 0 rgba(34, 53, 72, 0.08);
+  --el-shadow-md: 0 0 2px 0 rgba(34, 53, 72, 0.20), 0 2px 4px 0 rgba(34, 53, 72, 0.20);
+  --el-shadow-lg: 0 0 0 1px rgba(34, 53, 72, 0.48), 0 2px 8px 0 rgba(34, 53, 72, 0.30);
+  --el-shadow-xl: 0 4px 16px -2px rgba(34, 53, 72, 0.12), 0 1px 4px rgba(34, 53, 72, 0.08);
+
+  /* ===========================
+   * Z-INDEX
+   * =========================== */
+  --el-z-base: 0;
+  --el-z-dropdown: 50;
+  --el-z-sticky: 100;
+  --el-z-overlay: 200;
+  --el-z-modal: 300;
+  --el-z-popover: 400;
+  --el-z-toast: 500;
+
+  /* ===========================
+   * TRANSITIONS
+   * =========================== */
+  --el-duration-fast: 100ms;
+  --el-duration-normal: 200ms;
+  --el-duration-slow: 350ms;
+  --el-ease-default: cubic-bezier(0.16, 1, 0.3, 1);
+  --el-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+}

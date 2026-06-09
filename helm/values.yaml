@@ -1,0 +1,89 @@
+global:
+  imagePullSecret:
+    name: regsecret
+
+engagement-layer:
+  image:
+    repository: ariba-distribution.common.repositories.cloud.sap/invoicecapture/engagement-layer-native
+    tag: '[[ imageTag "invoicecapture/engagement-layer-native" ]]'
+
+  resources:
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+    requests:
+      memory: "64Mi"
+      cpu: "100m"
+  replicaCount: 1
+  port: 4180
+  health:
+    liveness:
+      path: /
+      periodSeconds: 30
+      failureThreshold: 5
+    readiness:
+      path: /
+      periodSeconds: 30
+      failureThreshold: 5
+  startupTimeoutSeconds: 60
+  terminationGracePeriodSeconds: 12
+  env:
+    NODE_ENV: "production"
+    DWC_APPLICATION: '{"landscape":"dev-eu10"}'
+
+  hpa:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+
+  expose:
+    enabled: true
+    host: engagement-layer-dev-eu10.a121620.kyma.ondemand.com
+    rules:
+      - accessStrategies:
+          - handler: allow
+        methods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - HEAD
+        path: /.*
+
+  networkSecurity:
+    enabled: true
+
+  sidecars:
+    oauth2-proxy:
+      image:
+        repository: quay.io/oauth2-proxy/oauth2-proxy
+        tag: v7.6.0
+      resources:
+        limits:
+          memory: "128Mi"
+          cpu: "100m"
+        requests:
+          memory: "64Mi"
+          cpu: "50m"
+      env:
+        OAUTH2_PROXY_PROVIDER: "oidc"
+        OAUTH2_PROXY_OIDC_ISSUER_URL: "https://invcapdevprv.accounts.ondemand.com"
+        OAUTH2_PROXY_CLIENT_ID:
+          secretKeyRef:
+            name: engagement-layer-oauth2-proxy
+            key: client-id
+        OAUTH2_PROXY_CLIENT_SECRET:
+          secretKeyRef:
+            name: engagement-layer-oauth2-proxy
+            key: client-secret
+        OAUTH2_PROXY_COOKIE_SECRET:
+          secretKeyRef:
+            name: engagement-layer-oauth2-proxy
+            key: cookie-secret
+        OAUTH2_PROXY_HTTP_ADDRESS: "0.0.0.0:4180"
+        OAUTH2_PROXY_UPSTREAMS: "http://127.0.0.1:8080/"
+        OAUTH2_PROXY_EMAIL_DOMAINS: "sap.com"
+        OAUTH2_PROXY_COOKIE_SECURE: "true"
+        OAUTH2_PROXY_REDIRECT_URL: "https://engagement-layer-dev-eu10.a121620.kyma.ondemand.com/oauth2/callback"
+        OAUTH2_PROXY_SKIP_PROVIDER_BUTTON: "true"
