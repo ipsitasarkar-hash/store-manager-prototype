@@ -453,12 +453,13 @@ const PriorityItem = ({ item, onAddTask }: { item: AIPriority; onAddTask: (task:
   );
 };
 
-const CommandCenter = ({ associates, onAddTask, taskBoard }: { associates: Associate[]; onAddTask: (task: EmployeeTask, employeeId: string) => void; taskBoard: EmployeeColumn[] }) => {
+const CommandCenter = ({ associates, onAddTask, taskBoard, showAlexAlert, onViewSuggestions }: { associates: Associate[]; onAddTask: (task: EmployeeTask, employeeId: string) => void; taskBoard: EmployeeColumn[]; showAlexAlert: boolean; onViewSuggestions: () => void }) => {
   const ff = '"72","72full",Arial,Helvetica,sans-serif';
   const actionableAlerts = initialAlerts.filter(a => a.status !== 'Done' && (a.severity === 'Critical' || a.severity === 'Warning'));
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [modalAlert, setModalAlert] = useState<StoreAlert | null>(null);
   const [acceptedIds, setAcceptedIds] = useState<Set<string>>(new Set());
+  const [alexDismissed, setAlexDismissed] = useState(false);
 
   return (
     <div style={{ padding: '32px 80px 0' }}>
@@ -497,8 +498,33 @@ const CommandCenter = ({ associates, onAddTask, taskBoard }: { associates: Assoc
         <div style={{ padding: '10px 16px', borderBottom: '1px solid #f0f2f4', display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#d9291c', display: 'inline-block', flexShrink: 0 }} />
           <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#d9291c', margin: 0, flex: 1 }}>Actionable Alerts</p>
-          <span style={{ fontFamily: ff, fontSize: 11, color: '#636d83' }}>{actionableAlerts.length} require action</span>
+          <span style={{ fontFamily: ff, fontSize: 11, color: '#636d83' }}>{actionableAlerts.length + (showAlexAlert && !alexDismissed ? 1 : 0)} require action</span>
         </div>
+
+        {/* Alex sign-off alert row */}
+        {showAlexAlert && !alexDismissed && (
+          <div style={{ borderBottom: '1px solid #f0f2f4', backgroundColor: '#fff8f0', display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px' }}>
+            <span style={{ padding: '2px 7px', borderRadius: 4, fontSize: 11, fontWeight: 700, fontFamily: ff, flexShrink: 0, backgroundColor: 'rgba(231,101,0,0.10)', color: '#e76500' }}>Warning</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontFamily: ff, fontSize: 12, fontWeight: 700, color: '#0b0c0f', margin: 0 }}>Alex T. has signed off</p>
+              <p style={{ fontFamily: ff, fontSize: 11, color: '#636d83', margin: '1px 0 0' }}>3 open tasks in Zone C need reassignment</p>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+              <button
+                onClick={onViewSuggestions}
+                style={{ padding: '5px 12px', borderRadius: 6, border: 'none', backgroundColor: '#5d36ff', color: '#fff', fontFamily: ff, fontSize: 11, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
+              >
+                <Zap size={11} /> View Joule's suggestions
+              </button>
+              <button
+                onClick={() => setAlexDismissed(true)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9fa8b4', padding: 2, display: 'flex' }}
+              >
+                <X size={14} />
+              </button>
+            </div>
+          </div>
+        )}
         {actionableAlerts.map((a) => {
           const isExpanded = expandedId === a.id;
           const isAccepted = acceptedIds.has(a.id);
@@ -567,6 +593,8 @@ const CommandCenter = ({ associates, onAddTask, taskBoard }: { associates: Assoc
           employees={taskBoard}
           prefillTitle={modalAlert.suggestedTask}
           prefillNote={modalAlert.recommendation}
+          prefillProduct={modalAlert.product}
+          prefillLocation={modalAlert.zone}
           onClose={() => setModalAlert(null)}
           onAdd={(task, empId) => {
             onAddTask(task, empId);
@@ -1299,7 +1327,7 @@ const initialTaskBoard: EmployeeColumn[] = [
 /* ══════════════════════════════════════════════════════
    PERSONALIZATION / MY DAY SECTION
 ══════════════════════════════════════════════════════ */
-const MyDaySection = ({ associates, onAddTask, taskBoard }: { associates: Associate[]; onAddTask: (task: EmployeeTask, employeeId: string) => void; taskBoard: EmployeeColumn[] }) => (
+const MyDaySection = ({ associates, onAddTask, taskBoard, showAlexAlert, onViewSuggestions }: { associates: Associate[]; onAddTask: (task: EmployeeTask, employeeId: string) => void; taskBoard: EmployeeColumn[]; showAlexAlert: boolean; onViewSuggestions: () => void }) => (
   <div>
     {/* Greeting */}
     <div style={{ padding: '32px 80px 0' }}>
@@ -1315,7 +1343,7 @@ const MyDaySection = ({ associates, onAddTask, taskBoard }: { associates: Associ
         Store Manager Dashboard — FreshMart Midtown
       </h1>
     </div>
-    <CommandCenter associates={associates} onAddTask={onAddTask} taskBoard={taskBoard} />
+    <CommandCenter associates={associates} onAddTask={onAddTask} taskBoard={taskBoard} showAlexAlert={showAlexAlert} onViewSuggestions={onViewSuggestions} />
   </div>
 );
 
@@ -1518,18 +1546,22 @@ const AddTaskModal = ({
   onAdd,
   prefillTitle = "",
   prefillNote = "",
+  prefillProduct = "",
+  prefillLocation = "",
 }: {
   employees: EmployeeColumn[];
   onClose: () => void;
   onAdd: (task: EmployeeTask, employeeId: string) => void;
   prefillTitle?: string;
   prefillNote?: string;
+  prefillProduct?: string;
+  prefillLocation?: string;
 }) => {
   const ff = '"72","72full",Arial,Helvetica,sans-serif';
   const [title, setTitle]           = useState(prefillTitle);
-  const [product, setProduct]       = useState("");
-  const [location, setLocation]     = useState("");
-  const [locationAutoFilled, setLocationAutoFilled] = useState(false);
+  const [product, setProduct]       = useState(prefillProduct);
+  const [location, setLocation]     = useState(prefillLocation);
+  const [locationAutoFilled, setLocationAutoFilled] = useState(!!prefillLocation);
   const [shelfSuggestion, setShelfSuggestion] = useState<{ product: string; shelf: string; zone: string } | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [priority, setPriority]     = useState<TaskPriority>("Medium");
@@ -2559,57 +2591,11 @@ const StoreManagerSpacePage = () => {
       >
         <SpaceHeader activeTab={activeTab} onTabChange={setActiveTab} />
 
-        {/* ── Alex sign-off notification banner ── */}
-        {showNotification && !reassigned && (
-          <div
-            style={{
-              margin: '0 24px 0',
-              padding: '12px 16px',
-              borderRadius: 10,
-              backgroundColor: '#fff8e1',
-              border: '1.5px solid #f9a825',
-              display: 'flex', alignItems: 'center', gap: 12,
-              animation: 'fade-in-up 0.35s ease-out both',
-              position: 'relative', zIndex: 20,
-            }}
-          >
-            <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,#8A48E6,#470CED)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <span style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#fff' }}>AT</span>
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#5d4037', margin: 0 }}>
-                Alex T. has signed off
-              </p>
-              <p style={{ fontFamily: ff, fontSize: 12, color: '#795548', margin: '2px 0 0' }}>
-                3 open tasks in Zone C need reassignment
-              </p>
-            </div>
-            <button
-              onClick={handleViewSuggestions}
-              style={{
-                padding: '7px 14px', borderRadius: 7, border: 'none',
-                backgroundColor: '#5d36ff', color: '#fff',
-                fontFamily: ff, fontSize: 12, fontWeight: 600,
-                cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
-                display: 'flex', alignItems: 'center', gap: 5,
-              }}
-            >
-              <Zap size={12} /> View Joule's suggestions
-            </button>
-            <button
-              onClick={() => setShowNotification(false)}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#795548', padding: 4, flexShrink: 0, display: 'flex' }}
-            >
-              <X size={16} />
-            </button>
-          </div>
-        )}
-
         <div className="flex-1 overflow-y-auto">
           {activeTab === 'Overview' && (
             <>
               {/* 1. Personalized My Day */}
-              <MyDaySection associates={initialAssociates} onAddTask={handleAddTask} taskBoard={taskBoard} />
+              <MyDaySection associates={initialAssociates} onAddTask={handleAddTask} taskBoard={taskBoard} showAlexAlert={showNotification && !reassigned} onViewSuggestions={handleViewSuggestions} />
 
               {/* Divider */}
               <div style={{ margin: '40px 80px 0', height: 1, backgroundColor: '#e6e7ea' }} />
