@@ -198,42 +198,66 @@ const ChatPaneIcon = () => (
   </svg>
 );
 
-const SpaceHeader = () => (
-  /* PaneBar — matches Figma px-[24px] py-[20px] */
-  <div
-    className="flex items-center justify-between shrink-0 relative z-10"
-    style={{ padding: '20px 24px' }}
-  >
-    {/* Left: task-list icon (matching screenshot) */}
-    <div className="flex items-center" style={{ gap: 8 }}>
-      <button
-        className="flex items-center justify-center rounded-lg hover:bg-[#f0f2f4] transition-colors"
-        style={{ padding: 10.855, borderRadius: 8 }}
-      >
-        <TaskListIcon />
-      </button>
+const SpaceHeader = ({ activeTab, onTabChange }: { activeTab: string; onTabChange: (t: string) => void }) => {
+  const ff = '"72","72full",Arial,Helvetica,sans-serif';
+  const tabs = ['Overview', 'Floor Plan', 'Alerts & Notifications', 'Team'];
+  return (
+    <div className="shrink-0 relative z-10" style={{ borderBottom: '1px solid #e6e7ea' }}>
+      {/* Top bar */}
+      <div className="flex items-center justify-between" style={{ padding: '20px 24px 0' }}>
+        <div className="flex items-center" style={{ gap: 8 }}>
+          <button
+            className="flex items-center justify-center rounded-lg hover:bg-[#f0f2f4] transition-colors"
+            style={{ padding: 10.855, borderRadius: 8 }}
+          >
+            <TaskListIcon />
+          </button>
+        </div>
+        <div className="flex items-center" style={{ gap: 8 }}>
+          <button
+            className="flex items-center gap-2 hover:bg-[#f0f2f4] transition-colors rounded-lg"
+            style={{ paddingLeft: 16, paddingRight: 16, paddingTop: 9, paddingBottom: 9, borderRadius: 8 }}
+          >
+            <OverviewIcon />
+            <span style={{ fontFamily: ff, fontSize: 16, fontWeight: 600, lineHeight: '22px', color: '#0b0c0f' }}>
+              Overview
+            </span>
+          </button>
+          <button
+            className="flex items-center justify-center hover:bg-[#f0f2f4] transition-colors rounded-lg"
+            style={{ padding: 10.855, borderRadius: 8 }}
+          >
+            <DotsIcon />
+          </button>
+        </div>
+      </div>
+      {/* Tab bar */}
+      <div style={{ display: 'flex', padding: '0 24px', gap: 0 }}>
+        {tabs.map(tab => (
+          <button
+            key={tab}
+            onClick={() => onTabChange(tab)}
+            style={{
+              fontFamily: ff,
+              fontSize: 14,
+              fontWeight: activeTab === tab ? 600 : 400,
+              color: activeTab === tab ? '#0057d2' : '#556170',
+              background: 'none',
+              border: 'none',
+              borderBottom: activeTab === tab ? '2px solid #0057d2' : '2px solid transparent',
+              padding: '10px 16px',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              transition: 'color 0.15s, border-color 0.15s',
+            }}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
     </div>
-
-    {/* Right: Overview btn + dots + chat toggle */}
-    <div className="flex items-center" style={{ gap: 8 }}>
-      <button
-        className="flex items-center gap-2 hover:bg-[#f0f2f4] transition-colors rounded-lg"
-        style={{ paddingLeft: 16, paddingRight: 16, paddingTop: 9, paddingBottom: 9, borderRadius: 8 }}
-      >
-        <OverviewIcon />
-        <span style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 16, fontWeight: 600, lineHeight: '22px', color: '#0b0c0f' }}>
-          Overview
-        </span>
-      </button>
-      <button
-        className="flex items-center justify-center hover:bg-[#f0f2f4] transition-colors rounded-lg"
-        style={{ padding: 10.855, borderRadius: 8 }}
-      >
-        <DotsIcon />
-      </button>
-    </div>
-  </div>
-);
+  );
+};
 
 /* ══════════════════════════════════════════════════════
    AI INSIGHTS PANEL  (same pattern as InsightsPanel)
@@ -2000,6 +2024,131 @@ const FloorplanSection = () => {
   );
 };
 /* ══════════════════════════════════════════════════════
+   ALERTS TAB
+══════════════════════════════════════════════════════ */
+const SEVERITY_CFG: Record<AlertSeverity, { color: string; bg: string }> = {
+  Critical: { color: '#d9291c', bg: 'rgba(217,41,28,0.08)' },
+  Warning:  { color: '#e76500', bg: 'rgba(231,101,0,0.08)' },
+  Info:     { color: '#0070f2', bg: 'rgba(0,112,242,0.08)' },
+  Resolved: { color: '#198450', bg: 'rgba(25,132,80,0.08)' },
+};
+
+const AlertsTab = ({ alerts, onAssign }: { alerts: StoreAlert[]; onAssign: (id: string, name: string) => void }) => {
+  const ff = '"72","72full",Arial,Helvetica,sans-serif';
+  const open    = alerts.filter(a => a.status !== 'Done');
+  const resolved = alerts.filter(a => a.status === 'Done');
+
+  const AlertRow = ({ a }: { a: StoreAlert }) => {
+    const cfg = SEVERITY_CFG[a.severity];
+    return (
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, padding: '14px 20px', borderBottom: '1px solid #f0f2f4' }}>
+        <span style={{ padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700, fontFamily: ff, flexShrink: 0, marginTop: 2, backgroundColor: cfg.bg, color: cfg.color }}>{a.severity}</span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+            <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 600, color: '#0b0c0f', margin: 0 }}>{a.product}</p>
+            <span style={{ fontFamily: ff, fontSize: 11, color: '#9fa8b4' }}>{a.zone} · {a.time}</span>
+          </div>
+          <p style={{ fontFamily: ff, fontSize: 12, color: '#556170', margin: '3px 0 0' }}>{a.issue}</p>
+          <p style={{ fontFamily: ff, fontSize: 11, color: '#9fa8b4', margin: '3px 0 0' }}>{a.detail}</p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+          {a.assignee && (
+            <span style={{ fontFamily: ff, fontSize: 11, color: '#556170', whiteSpace: 'nowrap' }}>→ {a.assignee}</span>
+          )}
+          <span style={{
+            padding: '3px 8px', borderRadius: 4, fontSize: 11, fontWeight: 600, fontFamily: ff,
+            backgroundColor: a.status === 'In Progress' ? 'rgba(0,112,242,0.08)' : a.status === 'Open' ? 'rgba(231,101,0,0.08)' : 'rgba(25,132,80,0.08)',
+            color: a.status === 'In Progress' ? '#0070f2' : a.status === 'Open' ? '#e76500' : '#198450',
+          }}>{a.status}</span>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ padding: '32px 80px' }}>
+      <h2 style={{ fontFamily: ff, fontSize: 20, fontWeight: 600, color: '#0b0c0f', margin: '0 0 20px' }}>Alerts & Notifications</h2>
+
+      {/* Open alerts */}
+      <div style={{ borderRadius: 10, border: '1px solid #e6e7ea', backgroundColor: '#fff', marginBottom: 24, overflow: 'hidden' }}>
+        <div style={{ padding: '12px 20px', borderBottom: '1px solid #f0f2f4', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#d9291c', display: 'inline-block' }} />
+          <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#0b0c0f', margin: 0, flex: 1 }}>Open Alerts</p>
+          <span style={{ fontFamily: ff, fontSize: 11, color: '#636d83' }}>{open.length} items</span>
+        </div>
+        {open.map(a => <AlertRow key={a.id} a={a} />)}
+        {open.length === 0 && (
+          <p style={{ fontFamily: ff, fontSize: 13, color: '#9fa8b4', padding: '20px', margin: 0, textAlign: 'center' }}>No open alerts</p>
+        )}
+      </div>
+
+      {/* Resolved */}
+      {resolved.length > 0 && (
+        <div style={{ borderRadius: 10, border: '1px solid #e6e7ea', backgroundColor: '#fff', overflow: 'hidden' }}>
+          <div style={{ padding: '12px 20px', borderBottom: '1px solid #f0f2f4', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#198450', display: 'inline-block' }} />
+            <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#0b0c0f', margin: 0 }}>Resolved</p>
+          </div>
+          {resolved.map(a => <AlertRow key={a.id} a={a} />)}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ══════════════════════════════════════════════════════
+   TEAM TAB
+══════════════════════════════════════════════════════ */
+const TeamTab = ({ taskBoard }: { taskBoard: EmployeeColumn[] }) => {
+  const ff = '"72","72full",Arial,Helvetica,sans-serif';
+  return (
+    <div style={{ padding: '32px 80px' }}>
+      <h2 style={{ fontFamily: ff, fontSize: 20, fontWeight: 600, color: '#0b0c0f', margin: '0 0 20px' }}>Team</h2>
+      <div style={{ borderRadius: 10, border: '1px solid #e6e7ea', backgroundColor: '#fff', overflow: 'hidden' }}>
+        {/* Header row */}
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr', padding: '10px 20px', borderBottom: '1px solid #f0f2f4', backgroundColor: '#f8f9fa' }}>
+          {['Associate', 'Zone', 'Status', 'Tasks Open', 'Tasks Done'].map(h => (
+            <span key={h} style={{ fontFamily: ff, fontSize: 11, fontWeight: 600, color: '#636d83', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</span>
+          ))}
+        </div>
+        {taskBoard.map((emp, i) => {
+          const presence = PRESENCE_CONFIG[emp.floorStatus];
+          const open = emp.tasks.filter(t => t.status !== 'Done').length;
+          const done = emp.tasks.filter(t => t.status === 'Done').length;
+          return (
+            <div key={emp.id} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr', padding: '14px 20px', borderBottom: i < taskBoard.length - 1 ? '1px solid #f0f2f4' : 'none', alignItems: 'center' }}>
+              {/* Name + avatar */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ position: 'relative', flexShrink: 0 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg,#8A48E6,#470CED)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ fontFamily: ff, fontSize: 11, fontWeight: 700, color: '#fff' }}>{emp.initials}</span>
+                  </div>
+                  <span style={{ position: 'absolute', bottom: 0, right: 0, width: 9, height: 9, borderRadius: '50%', backgroundColor: presence.dot, border: '1.5px solid #fff' }} />
+                </div>
+                <div>
+                  <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 600, color: '#0b0c0f', margin: 0 }}>{emp.name}</p>
+                  <p style={{ fontFamily: ff, fontSize: 11, color: '#9fa8b4', margin: 0 }}>{emp.role}</p>
+                </div>
+              </div>
+              {/* Zone */}
+              <span style={{ fontFamily: ff, fontSize: 13, color: '#556170' }}>{emp.tasks[0]?.zone ?? '—'}</span>
+              {/* Status pill */}
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', borderRadius: 20, backgroundColor: presence.labelBg, color: presence.labelColor, fontFamily: ff, fontSize: 11, fontWeight: 600, width: 'fit-content' }}>
+                {presence.label}
+              </span>
+              {/* Tasks open */}
+              <span style={{ fontFamily: ff, fontSize: 14, fontWeight: 600, color: open > 0 ? '#e76500' : '#636d83' }}>{open}</span>
+              {/* Tasks done */}
+              <span style={{ fontFamily: ff, fontSize: 14, fontWeight: 600, color: done > 0 ? '#198450' : '#636d83' }}>{done}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+/* ══════════════════════════════════════════════════════
    MAIN PAGE
 ══════════════════════════════════════════════════════ */
 const StoreManagerSpacePage = () => {
@@ -2008,6 +2157,9 @@ const StoreManagerSpacePage = () => {
 
   // Chat pane open/closed
   const [chatOpen, setChatOpen] = useState(false);
+
+  // Active tab
+  const [activeTab, setActiveTab] = useState('Overview');
 
   // Alex sign-off flow
   const [showNotification, setShowNotification] = useState(false);
@@ -2092,7 +2244,7 @@ const StoreManagerSpacePage = () => {
           boxShadow: '0px 22px 14px 0px rgba(0,0,0,0.06), 0px 182px 111px 0px rgba(0,0,0,0.05)',
         }}
       >
-        <SpaceHeader />
+        <SpaceHeader activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* ── Alex sign-off notification banner ── */}
         {showNotification && !reassigned && (
@@ -2141,26 +2293,44 @@ const StoreManagerSpacePage = () => {
         )}
 
         <div className="flex-1 overflow-y-auto">
-          {/* 1. Personalized My Day */}
-          <MyDaySection associates={initialAssociates} onAddTask={handleAddTask} />
+          {activeTab === 'Overview' && (
+            <>
+              {/* 1. Personalized My Day */}
+              <MyDaySection associates={initialAssociates} onAddTask={handleAddTask} />
 
-          {/* Divider */}
-          <div style={{ margin: '40px 80px 0', height: 1, backgroundColor: '#e6e7ea' }} />
+              {/* Divider */}
+              <div style={{ margin: '40px 80px 0', height: 1, backgroundColor: '#e6e7ea' }} />
 
-          {/* 2. Task Board */}
-          <TaskBoardSection taskBoard={taskBoard} onAddTask={handleAddTask} />
+              {/* 2. Task Board */}
+              <TaskBoardSection taskBoard={taskBoard} onAddTask={handleAddTask} />
 
-          {/* Divider */}
-          <div style={{ margin: '0 80px', height: 1, backgroundColor: '#e6e7ea' }} />
+              {/* Divider */}
+              <div style={{ margin: '0 80px', height: 1, backgroundColor: '#e6e7ea' }} />
 
-          {/* 3. AI Suggestions */}
-          <AISuggestionsSection onAddTask={handleAddTask} />
+              {/* 3. AI Suggestions */}
+              <AISuggestionsSection onAddTask={handleAddTask} />
 
-          {/* Divider */}
-          <div style={{ margin: '40px 80px 0', height: 1, backgroundColor: '#e6e7ea' }} />
+              {/* Divider */}
+              <div style={{ margin: '40px 80px 0', height: 1, backgroundColor: '#e6e7ea' }} />
 
-          {/* 4. Store Floorplan */}
-          <FloorplanSection />
+              {/* 4. Store Floorplan */}
+              <FloorplanSection />
+            </>
+          )}
+
+          {activeTab === 'Floor Plan' && (
+            <div style={{ padding: '40px 80px' }}>
+              <FloorplanSection />
+            </div>
+          )}
+
+          {activeTab === 'Alerts & Notifications' && (
+            <AlertsTab alerts={alerts} onAssign={handleAssign} />
+          )}
+
+          {activeTab === 'Team' && (
+            <TeamTab taskBoard={taskBoard} />
+          )}
         </div>
       </div>
 
