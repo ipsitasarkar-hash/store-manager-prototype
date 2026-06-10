@@ -1853,165 +1853,213 @@ const TaskBoardSection = ({ taskBoard, onAddTask }: { taskBoard: EmployeeColumn[
    STORE FLOORPLAN MODAL
 ══════════════════════════════════════════════════════ */
 type AisleStatus = 'critical' | 'warning' | 'ok';
-interface AisleCell { id: string; label: string; status: AisleStatus; issue?: string; }
+interface ShelfCell { id: string; label: string; status: AisleStatus; issue?: string; }
 
-const AISLES: AisleCell[][] = [
-  [
-    { id: '1A', label: 'Bananas & Citrus',      status: 'ok'       },
-    { id: '1B', label: 'Apples & Pears',         status: 'ok'       },
-    { id: '1C', label: 'Stone Fruit',            status: 'ok'       },
-    { id: '1D', label: 'Fresh Herbs',            status: 'critical', issue: 'Delivery not stocked' },
-  ],
-  [
-    { id: '2A', label: 'Tropical Fruit',         status: 'ok'       },
-    { id: '2B', label: 'Avocados & Limes',       status: 'critical', issue: '~2 units left' },
-    { id: '2C', label: 'Berries (shelf)',         status: 'ok'       },
-    { id: '2D', label: 'Lemons & Oranges',       status: 'warning'  },
-  ],
-  [
-    { id: '3A', label: 'Strawberries',           status: 'critical', issue: 'Likely empty' },
-    { id: '3B', label: 'Blueberries',            status: 'warning'  },
-    { id: '3C', label: 'Tomatoes & Peppers',     status: 'warning'  },
-    { id: '3D', label: 'Mushrooms',              status: 'ok'       },
-  ],
-  [
-    { id: '4A', label: 'Refrig: Salads',         status: 'ok'       },
-    { id: '4B', label: 'Refrig: Cut Fruit',      status: 'ok'       },
-    { id: '4C', label: 'Refrig: Spinach',        status: 'warning'  },
-    { id: '4D', label: 'Refrig: Juices',         status: 'ok'       },
-  ],
-];
-
-const STATUS_STYLE: Record<AisleStatus, { bg: string; border: string; badge: string; badgeText: string }> = {
-  critical: { bg: '#fff0f0', border: '#d9291c', badge: '#d9291c', badgeText: 'Empty / Out' },
-  warning:  { bg: '#fff8f0', border: '#e76500', badge: '#e76500', badgeText: 'Running Low' },
-  ok:       { bg: '#f6fff8', border: '#c8e6c9', badge: '#198450', badgeText: 'OK'          },
+/* ── Status colour tokens ── */
+const STATUS_STYLE: Record<AisleStatus, { bg: string; border: string; dot: string; text: string }> = {
+  critical: { bg: '#fce8e8', border: '#d9291c', dot: '#d9291c', text: '#d9291c' },
+  warning:  { bg: '#fff3e0', border: '#e76500', dot: '#e76500', text: '#e76500' },
+  ok:       { bg: '#dde8f5', border: '#5b8db8', dot: '#198450', text: '#1a5276' },
 };
 
+/* ── Floor layout data ── */
+// Wall shelves (top row — 4 sections)
+const WALL_SHELVES: ShelfCell[] = [
+  { id: 'W1', label: 'Citrus / Bananas',   status: 'ok'       },
+  { id: 'W2', label: 'Apples & Pears',     status: 'ok'       },
+  { id: 'W3', label: 'Stone Fruit',        status: 'warning'  },
+  { id: 'W4', label: 'Fresh Herbs',        status: 'critical', issue: 'Delivery not stocked' },
+];
+
+// Middle gondola aisles — 3 double-sided columns × 2 shelves each
+const GONDOLA_COLS: { zone: string; top: ShelfCell; bottom: ShelfCell }[] = [
+  { zone: 'Zone A', top: { id: 'A1', label: 'Tropical Fruit',    status: 'ok'       }, bottom: { id: 'A2', label: 'Strawberries',       status: 'critical', issue: 'Likely empty' } },
+  { zone: 'Zone B', top: { id: 'B1', label: 'Avocados & Limes',  status: 'critical', issue: '~2 units left' }, bottom: { id: 'B2', label: 'Blueberries',        status: 'warning'  } },
+  { zone: 'Zone C', top: { id: 'C1', label: 'Tomatoes / Peppers',status: 'warning'  }, bottom: { id: 'C2', label: 'Baby Spinach 5oz',   status: 'critical', issue: 'Zero back stock' } },
+];
+
+// Right-side power wall — 4 shelves
+const POWER_WALL: ShelfCell[] = [
+  { id: 'P1', label: 'Bottled Water',     status: 'critical', issue: 'Stock-out by 3 PM' },
+  { id: 'P2', label: 'Energy Drinks',     status: 'ok'       },
+  { id: 'P3', label: 'Juices',            status: 'ok'       },
+  { id: 'P4', label: 'Kombucha',          status: 'warning'  },
+];
+
+// Bottom end caps (2 cells)
+const END_CAPS: ShelfCell[] = [
+  { id: 'E1', label: 'Seasonal Promo',    status: 'ok'      },
+  { id: 'E2', label: 'Cut Fruit / Salads',status: 'warning' },
+];
+
 const FloorplanModal = ({ onClose }: { onClose: () => void }) => {
-  const criticalAisles = AISLES.flat().filter(a => a.status === 'critical');
+  const ff = '"72","72full",Arial,Helvetica,sans-serif';
+  const allShelves = [...WALL_SHELVES, ...GONDOLA_COLS.flatMap(c => [c.top, c.bottom]), ...POWER_WALL, ...END_CAPS];
+  const criticals = allShelves.filter(s => s.status === 'critical');
+
+  const Shelf = ({ cell, style }: { cell: ShelfCell; style?: React.CSSProperties }) => {
+    const s = STATUS_STYLE[cell.status];
+    return (
+      <div style={{
+        backgroundColor: s.bg,
+        border: `1.5px solid ${s.border}`,
+        borderRadius: 6,
+        padding: '6px 8px',
+        position: 'relative',
+        ...style,
+      }}>
+        {cell.status === 'critical' && (
+          <span style={{ position: 'absolute', top: 4, right: 5, width: 7, height: 7, borderRadius: '50%', backgroundColor: '#d9291c', display: 'inline-block' }} />
+        )}
+        <div style={{ fontFamily: ff, fontSize: 10, fontWeight: 700, color: s.text, lineHeight: 1 }}>{cell.id}</div>
+        <div style={{ fontFamily: ff, fontSize: 9, color: '#444', marginTop: 3, lineHeight: 1.3 }}>{cell.label}</div>
+        {cell.issue && <div style={{ fontFamily: ff, fontSize: 8, color: s.dot, marginTop: 2, lineHeight: 1.2 }}>{cell.issue}</div>}
+      </div>
+    );
+  };
+
   return (
-  <div
-    style={{
-      position: 'fixed', inset: 0, zIndex: 1000,
-      backgroundColor: 'rgba(0,0,0,0.45)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      padding: 24,
-    }}
-    onClick={onClose}
-  >
     <div
-      style={{
-        backgroundColor: '#fff', borderRadius: 12, width: '100%', maxWidth: 680,
-        maxHeight: '90vh', overflow: 'hidden', display: 'flex', flexDirection: 'column',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
-      }}
-      onClick={e => e.stopPropagation()}
+      style={{ position: 'fixed', inset: 0, zIndex: 1000, backgroundColor: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
+      onClick={onClose}
     >
-      {/* Header */}
-      <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid #e6e7ea', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 8, backgroundColor: '#f1ecff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div
+        style={{ backgroundColor: '#fff', borderRadius: 12, width: '100%', maxWidth: 820, maxHeight: '92vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 20px 60px rgba(0,0,0,0.2)' }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div style={{ padding: '16px 24px', borderBottom: '1px solid #e6e7ea', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <MapPin size={18} style={{ color: '#552cff' }} />
+            <div>
+              <p style={{ fontFamily: ff, fontSize: 15, fontWeight: 700, color: '#0b0c0f', margin: 0 }}>Store Floorplan — Produce Dept</p>
+              <p style={{ fontFamily: ff, fontSize: 11, color: '#636d83', margin: '2px 0 0' }}>Live stock status · Shelf positions</p>
+            </div>
           </div>
-          <div>
-            <p style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 16, fontWeight: 600, color: '#0b0c0f', margin: 0 }}>
-              Store Floorplan — Produce Dept
-            </p>
-            <p style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 12, color: '#636d83', margin: '2px 0 0' }}>
-              Shelf positions · Live stock status
-            </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            {/* Legend */}
+            {(['critical','warning','ok'] as AisleStatus[]).map(s => (
+              <span key={s} style={{ display: 'flex', alignItems: 'center', gap: 5, fontFamily: ff, fontSize: 11, color: '#636d83' }}>
+                <span style={{ width: 9, height: 9, borderRadius: '50%', backgroundColor: STATUS_STYLE[s].dot, display: 'inline-block', flexShrink: 0 }} />
+                {s === 'critical' ? 'Empty / Critical' : s === 'warning' ? 'Running Low' : 'OK'}
+              </span>
+            ))}
+            <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#636d83', display: 'flex' }}>
+              <X size={20} />
+            </button>
           </div>
         </div>
-        <button
-          onClick={onClose}
-          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#636d83', display: 'flex' }}
-        >
-          <X size={20} />
-        </button>
-      </div>
 
-      {/* Body */}
-      <div style={{ overflowY: 'auto', padding: '20px 24px 24px' }}>
-
-        {/* ── Critical issues alert banner ── */}
-        <div style={{ backgroundColor: '#fff0f0', border: '1.5px solid #d9291c', borderRadius: 10, padding: '14px 16px', marginBottom: 20 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-            <AlertCircle size={16} style={{ color: '#d9291c', flexShrink: 0 }} />
-            <span style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 13, fontWeight: 700, color: '#d9291c' }}>
-              {criticalAisles.length} Critical Issue{criticalAisles.length !== 1 ? 's' : ''} — Immediate Action Required
-            </span>
+        {/* Critical banner */}
+        {criticals.length > 0 && (
+          <div style={{ margin: '12px 20px 0', backgroundColor: '#fff0f0', border: '1px solid #f5c2c2', borderRadius: 8, padding: '10px 14px', flexShrink: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap', rowGap: 4 }}>
+              <AlertCircle size={14} style={{ color: '#d9291c', flexShrink: 0 }} />
+              <span style={{ fontFamily: ff, fontSize: 12, fontWeight: 700, color: '#d9291c' }}>{criticals.length} Critical — Immediate Action:</span>
+              {criticals.map(c => (
+                <span key={c.id} style={{ fontFamily: ff, fontSize: 11, backgroundColor: '#d9291c', color: '#fff', borderRadius: 4, padding: '1px 7px' }}>{c.id} {c.label}</span>
+              ))}
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {criticalAisles.map(aisle => (
-              <div key={aisle.id} style={{ display: 'flex', alignItems: 'center', gap: 10, backgroundColor: '#fff', border: '1px solid #f5c2c2', borderRadius: 7, padding: '9px 12px' }}>
-                <div style={{ width: 32, height: 32, borderRadius: 6, backgroundColor: '#d9291c', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <span style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 13, fontWeight: 700, color: '#fff' }}>{aisle.id}</span>
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 13, fontWeight: 600, color: '#0b0c0f', margin: 0 }}>{aisle.label}</p>
-                  {aisle.issue && <p style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 11, color: '#d9291c', margin: '2px 0 0' }}>{aisle.issue}</p>}
-                </div>
-                <div style={{ backgroundColor: '#d9291c', borderRadius: 10, padding: '2px 8px', fontSize: 10, fontWeight: 700, color: '#fff', fontFamily: '"72","72full",Arial,Helvetica,sans-serif', flexShrink: 0 }}>
-                  EMPTY / OUT
+        )}
+
+        {/* ── FLOOR PLAN BODY ── */}
+        <div style={{ overflowY: 'auto', padding: '16px 20px 20px', flex: 1 }}>
+          {/* Outer store boundary */}
+          <div style={{
+            border: '2px solid #4a7fa5',
+            borderRadius: 10,
+            backgroundColor: '#f4f8fb',
+            padding: '14px 14px 10px',
+            position: 'relative',
+          }}>
+
+            {/* ── TOP WALL SHELVES ── */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8, marginBottom: 12 }}>
+              {WALL_SHELVES.map(c => <Shelf key={c.id} cell={c} style={{ minHeight: 44 }} />)}
+            </div>
+
+            {/* ── MAIN FLOOR AREA: left strip + gondolas + right power wall ── */}
+            <div style={{ display: 'flex', gap: 8, alignItems: 'stretch' }}>
+
+              {/* Impulse Purchase strip (left vertical) */}
+              <div style={{
+                width: 36, flexShrink: 0, backgroundColor: '#c5d8ec', border: '1.5px solid #4a7fa5', borderRadius: 6,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <span style={{ fontFamily: ff, fontSize: 9, fontWeight: 700, color: '#1a5276', writingMode: 'vertical-rl', transform: 'rotate(180deg)', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                  Impulse Purchase
+                </span>
+              </div>
+
+              {/* Gondola aisles — zone columns with dashed aisle borders */}
+              <div style={{ flex: 1, display: 'flex', gap: 8 }}>
+                {GONDOLA_COLS.map(col => (
+                  <div key={col.zone} style={{ flex: 1, border: '1.5px dashed #7aafd4', borderRadius: 8, padding: 8, display: 'flex', flexDirection: 'column', gap: 8, backgroundColor: 'rgba(255,255,255,0.5)' }}>
+                    <div style={{ fontFamily: ff, fontSize: 9, fontWeight: 700, color: '#4a7fa5', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 2, textAlign: 'center' }}>{col.zone}</div>
+                    <Shelf cell={col.top} style={{ flex: 1 }} />
+                    <Shelf cell={col.bottom} style={{ flex: 1 }} />
+                  </div>
+                ))}
+
+                {/* 4th column: standalone shelf + customer flow label */}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ backgroundColor: '#dde8f5', border: '1.5px solid #5b8db8', borderRadius: 6, padding: '6px 8px', flex: 1, minHeight: 56 }}>
+                    <div style={{ fontFamily: ff, fontSize: 9, fontWeight: 700, color: '#1a5276' }}>Zone D</div>
+                    <div style={{ fontFamily: ff, fontSize: 9, color: '#444', marginTop: 3 }}>Seasonal / Promo</div>
+                  </div>
+                  <div style={{ backgroundColor: '#dde8f5', border: '1.5px solid #5b8db8', borderRadius: 6, padding: '6px 8px', flex: 1, minHeight: 56 }}>
+                    <div style={{ fontFamily: ff, fontSize: 9, fontWeight: 700, color: '#1a5276' }}>Refrig</div>
+                    <div style={{ fontFamily: ff, fontSize: 9, color: '#444', marginTop: 3 }}>Cut Fruit / Salads</div>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* Legend */}
-        <div style={{ display: 'flex', gap: 16, marginBottom: 14, flexWrap: 'wrap' }}>
-          {(['critical', 'warning', 'ok'] as AisleStatus[]).map(s => (
-            <span key={s} style={{ display: 'flex', alignItems: 'center', gap: 6, fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 12, color: '#636d83' }}>
-              <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: STATUS_STYLE[s].badge, display: 'inline-block' }} />
-              {STATUS_STYLE[s].badgeText}
-            </span>
-          ))}
-        </div>
-
-        {/* Entrance strip */}
-        <div style={{ backgroundColor: '#fffde7', border: '1.5px solid #f9a825', borderRadius: 8, padding: '8px 16px', textAlign: 'center', marginBottom: 12, fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 13, fontWeight: 600, color: '#5d4037' }}>
-          🛒 Entrance / Checkout
-        </div>
-
-        {/* Aisle grid */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          {AISLES.map((row, ri) => (
-            <div key={ri} style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
-              {row.map(aisle => {
-                const s = STATUS_STYLE[aisle.status];
-                const isCritical = aisle.status === 'critical';
-                return (
-                  <div key={aisle.id} style={{ backgroundColor: s.bg, border: `2px solid ${s.border}`, borderRadius: 8, padding: '12px 8px', textAlign: 'center', position: 'relative' }}>
-                    {isCritical && (
-                      <div style={{ position: 'absolute', top: 6, right: 6 }}>
-                        <AlertCircle size={12} style={{ color: '#d9291c' }} />
-                      </div>
-                    )}
-                    <div style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 20, fontWeight: 700, color: isCritical ? '#d9291c' : '#0b0c0f', lineHeight: 1 }}>
-                      {aisle.id}
-                    </div>
-                    <div style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 11, color: '#444', marginTop: 5, lineHeight: 1.3 }}>
-                      {aisle.label}
-                    </div>
-                    <div style={{ marginTop: 6, display: 'inline-block', backgroundColor: s.badge, borderRadius: 10, padding: '2px 7px', fontSize: 10, fontWeight: 600, color: '#fff', fontFamily: '"72","72full",Arial,Helvetica,sans-serif' }}>
-                      {s.badgeText}
-                    </div>
-                  </div>
-                );
-              })}
+              {/* Power Wall (right vertical column of 4 shelves) */}
+              <div style={{ width: 64, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 8, border: '1.5px dashed #7aafd4', borderRadius: 8, padding: 6, backgroundColor: 'rgba(255,255,255,0.5)' }}>
+                <div style={{ fontFamily: ff, fontSize: 8, fontWeight: 700, color: '#4a7fa5', textTransform: 'uppercase', textAlign: 'center', letterSpacing: '0.4px' }}>Power Wall</div>
+                {POWER_WALL.map(c => <Shelf key={c.id} cell={c} style={{ flex: 1, minHeight: 38 }} />)}
+              </div>
             </div>
-          ))}
-        </div>
 
-        {/* Back room */}
-        <div style={{ marginTop: 8, backgroundColor: '#f5f5f5', border: '1.5px solid #bdbdbd', borderRadius: 8, padding: '8px 16px', textAlign: 'center', fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 13, fontWeight: 500, color: '#616161' }}>
-          📦 Back Room / Receiving
+            {/* ── BOTTOM ROW: Checkout + customer flow arrow + end caps ── */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+              {/* Checkout */}
+              <div style={{
+                width: 36 + 8 + (/* impulse */ 0), flexShrink: 0,
+              }}>
+                <div style={{ width: 36, backgroundColor: '#2a6099', borderRadius: 6, padding: '6px 4px', textAlign: 'center' }}>
+                  <span style={{ fontFamily: ff, fontSize: 8, fontWeight: 700, color: '#fff', textTransform: 'uppercase' }}>Check-out</span>
+                </div>
+              </div>
+
+              {/* Customer flow arrow */}
+              <div style={{ flex: 0.6, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                <div style={{ width: 28, height: 2, backgroundColor: '#4a7fa5' }} />
+                <div style={{ width: 0, height: 0, borderLeft: '8px solid #4a7fa5', borderTop: '5px solid transparent', borderBottom: '5px solid transparent' }} />
+                <span style={{ fontFamily: ff, fontSize: 8, color: '#4a7fa5', fontWeight: 600 }}>Customer Flow</span>
+              </div>
+
+              {/* End caps */}
+              <div style={{ flex: 1, display: 'flex', gap: 8 }}>
+                {END_CAPS.map(c => <Shelf key={c.id} cell={c} style={{ flex: 1 }} />)}
+              </div>
+
+              {/* Entrance/Exit gap (matches power wall width) */}
+              <div style={{ width: 64, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 3 }}>
+                <div style={{ borderTop: '2px dashed #4a7fa5', width: '100%' }} />
+                <span style={{ fontFamily: ff, fontSize: 8, color: '#4a7fa5', fontWeight: 600, textAlign: 'center' }}>Entrance & Exit</span>
+              </div>
+            </div>
+
+            {/* ── WINDOW DISPLAY (bottom outside store) ── */}
+            <div style={{ margin: '10px -14px -10px', borderTop: '2px solid #4a7fa5', padding: '7px 14px', backgroundColor: '#d6eaf8', borderRadius: '0 0 8px 8px', textAlign: 'center' }}>
+              <span style={{ fontFamily: ff, fontSize: 10, fontWeight: 600, color: '#1a5276', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Window Display</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
   );
 };
 
