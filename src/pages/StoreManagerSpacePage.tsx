@@ -1727,38 +1727,115 @@ const AddTaskModal = ({
 ══════════════════════════════════════════════════════ */
 const TaskBoardSection = ({ taskBoard, onAddTask }: { taskBoard: EmployeeColumn[]; onAddTask: (task: EmployeeTask, employeeId: string) => void }) => {
   const [showAddTask, setShowAddTask] = useState(false);
+  const [groupBy, setGroupBy] = useState<'employee' | 'status'>('employee');
+  const ff = '"72","72full",Arial,Helvetica,sans-serif';
 
   const totalOpen = taskBoard.flatMap(e => e.tasks).filter(t => t.status !== "Done").length;
   const totalDone = taskBoard.flatMap(e => e.tasks).filter(t => t.status === "Done").length;
+
+  const PRIORITY_COLORS: Record<TaskPriority, { color: string; bg: string }> = {
+    High:   { color: '#d9291c', bg: 'rgba(217,41,28,0.08)' },
+    Medium: { color: '#e76500', bg: 'rgba(231,101,0,0.08)' },
+    Low:    { color: '#198450', bg: 'rgba(25,132,80,0.08)' },
+  };
+
+  const STATUS_COLS: { status: EmployeeTaskStatus; label: string; color: string; border: string }[] = [
+    { status: 'To Do',       label: 'To Do',       color: '#636d83', border: '#e6e7ea' },
+    { status: 'In Progress', label: 'In Progress',  color: '#0070f2', border: '#b3d4ff' },
+    { status: 'Done',        label: 'Done',         color: '#198450', border: '#b7e4c7' },
+  ];
+
+  const TaskCard = ({ task, ownerName }: { task: EmployeeTask; ownerName?: string }) => {
+    const pc = PRIORITY_COLORS[task.priority];
+    return (
+      <div style={{ backgroundColor: '#fff', border: '1px solid #e6e7ea', borderRadius: 8, padding: '10px 12px', marginBottom: 8 }}>
+        <p style={{ fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#0b0c0f', margin: '0 0 5px', lineHeight: '16px' }}>{task.title}</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+          <span style={{ fontFamily: ff, fontSize: 10, color: '#9fa8b4' }}>{task.zone}</span>
+          {task.time && <span style={{ fontFamily: ff, fontSize: 10, color: '#9fa8b4' }}>· {task.time}</span>}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 7 }}>
+          <span style={{ padding: '2px 6px', borderRadius: 4, fontSize: 10, fontWeight: 700, fontFamily: ff, backgroundColor: pc.bg, color: pc.color }}>{task.priority}</span>
+          {ownerName && (
+            <span style={{ fontFamily: ff, fontSize: 10, color: '#636d83', backgroundColor: '#f0f2f4', borderRadius: 4, padding: '2px 6px' }}>{ownerName}</span>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div style={{ padding: '40px 80px 0' }}>
       {/* Section header */}
       <div className="flex items-center justify-between" style={{ marginBottom: 20 }}>
         <div>
-          <h2 style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 20, fontWeight: 600, color: '#0b0c0f', margin: 0 }}>Task Board</h2>
-          <p style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 13, fontWeight: 400, color: '#636d83', margin: '4px 0 0' }}>
-            {totalOpen} open · {totalDone} completed · 3 associates
+          <h2 style={{ fontFamily: ff, fontSize: 20, fontWeight: 600, color: '#0b0c0f', margin: 0 }}>Task Board</h2>
+          <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 400, color: '#636d83', margin: '4px 0 0' }}>
+            {totalOpen} open · {totalDone} completed · {taskBoard.length} associates
           </p>
         </div>
-        <button
-          onClick={() => setShowAddTask(true)}
-          style={{
-            padding: '8px 16px', borderRadius: 8,
-            border: 'none', backgroundColor: '#0070f2',
-            fontFamily: '"72","72full",Arial,Helvetica,sans-serif',
-            fontSize: 13, fontWeight: 600, color: '#fff',
-            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
-          }}
-        >
-          <Plus size={14} /> Add Task
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {/* Toggle */}
+          <div style={{ display: 'flex', border: '1px solid #e6e7ea', borderRadius: 8, overflow: 'hidden', backgroundColor: '#f8f9fa' }}>
+            {(['employee', 'status'] as const).map(opt => (
+              <button
+                key={opt}
+                onClick={() => setGroupBy(opt)}
+                style={{
+                  fontFamily: ff, fontSize: 12, fontWeight: 600,
+                  padding: '6px 14px', border: 'none', cursor: 'pointer',
+                  backgroundColor: groupBy === opt ? '#0070f2' : 'transparent',
+                  color: groupBy === opt ? '#fff' : '#636d83',
+                  transition: 'background 0.15s, color 0.15s',
+                }}
+              >
+                {opt === 'employee' ? 'By Employee' : 'By Status'}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => setShowAddTask(true)}
+            style={{
+              padding: '8px 16px', borderRadius: 8,
+              border: 'none', backgroundColor: '#0070f2',
+              fontFamily: ff, fontSize: 13, fontWeight: 600, color: '#fff',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
+            }}
+          >
+            <Plus size={14} /> Add Task
+          </button>
+        </div>
       </div>
 
-      {/* Employee columns */}
-      <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-        {taskBoard.map(emp => <EmployeeTaskColumn key={emp.id} employee={emp} />)}
-      </div>
+      {/* Board */}
+      {groupBy === 'employee' ? (
+        <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+          {taskBoard.map(emp => <EmployeeTaskColumn key={emp.id} employee={emp} />)}
+        </div>
+      ) : (
+        <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
+          {STATUS_COLS.map(col => {
+            const allTasks = taskBoard.flatMap(emp => emp.tasks.filter(t => t.status === col.status).map(t => ({ task: t, ownerName: emp.name })));
+            return (
+              <div key={col.status} style={{ flex: '1 1 0', minWidth: 0, borderRadius: 10, border: `1.5px solid ${col.border}`, backgroundColor: '#fff', overflow: 'hidden' }}>
+                {/* Column header */}
+                <div style={{ padding: '10px 14px', borderBottom: `1px solid ${col.border}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: col.status === 'In Progress' ? 'rgba(0,112,242,0.04)' : col.status === 'Done' ? 'rgba(25,132,80,0.04)' : '#f8f9fa' }}>
+                  <span style={{ fontFamily: ff, fontSize: 12, fontWeight: 700, color: col.color, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{col.label}</span>
+                  <span style={{ fontFamily: ff, fontSize: 11, fontWeight: 600, color: col.color, backgroundColor: col.status === 'In Progress' ? 'rgba(0,112,242,0.1)' : col.status === 'Done' ? 'rgba(25,132,80,0.1)' : '#e6e7ea', borderRadius: 10, padding: '1px 7px' }}>{allTasks.length}</span>
+                </div>
+                {/* Cards */}
+                <div style={{ padding: '10px 10px 4px' }}>
+                  {allTasks.length === 0 ? (
+                    <p style={{ fontFamily: ff, fontSize: 12, color: '#c4c9d4', textAlign: 'center', padding: '16px 0', margin: 0 }}>No tasks</p>
+                  ) : (
+                    allTasks.map(({ task, ownerName }) => <TaskCard key={task.id} task={task} ownerName={ownerName} />)
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Add Task Modal */}
       {showAddTask && (
