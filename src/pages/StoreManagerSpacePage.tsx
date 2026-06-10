@@ -2454,39 +2454,50 @@ const StoreManagerSpacePage = () => {
         </div>
       </div>
 
-      {/* ── Right Chat Pane — collapses to icon tab when closed ── */}
-      <div style={{
-        width: chatOpen ? 508 : 48,
-        flexShrink: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        transition: 'width 0.3s cubic-bezier(0.4,0,0.2,1)',
-        overflow: 'hidden',
-        borderLeft: '1px solid #e6e7ea',
-        backgroundColor: '#f8f9fa',
-        position: 'relative',
-      }}>
-        {/* Collapsed tab — icon only, no text */}
-        {!chatOpen && (
-          <button
-            onClick={() => setChatOpen(true)}
-            style={{
-              position: 'absolute', inset: 0, width: '100%', height: '100%',
-              background: 'none', border: 'none', cursor: 'pointer',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}
-          >
-            <ChatPaneIcon />
-          </button>
-        )}
-        <div style={{ width: 508, height: '100%', flexShrink: 0 }}>
-          <SpaceChatPanel
-            alerts={alerts}
-            onAssign={handleAssign}
-            onReassignConfirmed={handleReassignConfirmed}
-            triggerAlexSignoff={triggerChat}
-          />
+      {/* ── Right Chat Pane + toggle button ── */}
+      <div style={{ position: 'relative', flexShrink: 0, display: 'flex' }}>
+        {/* Toggle button — always visible at top, sits on the left edge of the pane */}
+        <button
+          onClick={() => setChatOpen(o => !o)}
+          style={{
+            position: 'absolute',
+            top: 16,
+            left: -20,
+            zIndex: 30,
+            width: 40,
+            height: 40,
+            borderRadius: 10,
+            border: '1px solid #e6e7ea',
+            backgroundColor: chatOpen ? '#e5ecf5' : '#fff',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.10)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'background 0.15s',
+          }}
+        >
+          <ChatPaneIcon />
+        </button>
+
+        {/* Chat panel — slides in/out */}
+        <div style={{
+          width: chatOpen ? 508 : 0,
+          flexShrink: 0,
+          height: '100%',
+          transition: 'width 0.3s cubic-bezier(0.4,0,0.2,1)',
+          overflow: 'hidden',
+          borderLeft: chatOpen ? '1px solid #e6e7ea' : 'none',
+          backgroundColor: '#f8f9fa',
+        }}>
+          <div style={{ width: 508, height: '100%' }}>
+            <SpaceChatPanel
+              alerts={alerts}
+              onAssign={handleAssign}
+              onReassignConfirmed={handleReassignConfirmed}
+              triggerAlexSignoff={triggerChat}
+            />
+          </div>
         </div>
       </div>
     </div>
