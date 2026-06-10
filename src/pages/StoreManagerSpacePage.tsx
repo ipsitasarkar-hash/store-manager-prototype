@@ -214,7 +214,7 @@ const ChatPaneIcon = () => (
 
 const SpaceHeader = ({ activeTab, onTabChange }: { activeTab: string; onTabChange: (t: string) => void }) => {
   const ff = '"72","72full",Arial,Helvetica,sans-serif';
-  const tabs = ['Overview', 'Floor Plan', 'Alerts & Notifications', 'Team'];
+  const tabs = ['Overview', 'Floor Plan', 'Notifications', 'Team'];
   return (
     <div className="shrink-0 relative z-10" style={{ borderBottom: '1px solid #e6e7ea' }}>
       {/* Top bar */}
@@ -453,40 +453,38 @@ const PriorityItem = ({ item, onAddTask }: { item: AIPriority; onAddTask: (task:
   );
 };
 
-const CommandCenter = ({ associates, onAddTask }: { associates: Associate[]; onAddTask: (task: EmployeeTask, employeeId: string) => void }) => {
+const CommandCenter = ({ associates, onAddTask, taskBoard }: { associates: Associate[]; onAddTask: (task: EmployeeTask, employeeId: string) => void; taskBoard: EmployeeColumn[] }) => {
   const ff = '"72","72full",Arial,Helvetica,sans-serif';
   const actionableAlerts = initialAlerts.filter(a => a.status !== 'Done' && (a.severity === 'Critical' || a.severity === 'Warning'));
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [modalAlert, setModalAlert] = useState<StoreAlert | null>(null);
+  const [acceptedIds, setAcceptedIds] = useState<Set<string>>(new Set());
 
   return (
     <div style={{ padding: '32px 80px 0' }}>
 
       {/* ── Row 1: KPIs ── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 12, marginBottom: 20 }}>
-        {/* Tasks Complete */}
         <div style={{ borderRadius: 8, border: '1px solid #e6e7ea', backgroundColor: '#fff', padding: '14px 16px' }}>
           <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: '#636d83', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Tasks Complete</p>
           <p style={{ fontFamily: ff, fontSize: 22, fontWeight: 700, color: '#0b0c0f', margin: '0 0 3px', lineHeight: 1 }}>4 / 12</p>
           <p style={{ fontFamily: ff, fontSize: 11, color: '#636d83', margin: 0 }}>33% shift done</p>
         </div>
-        {/* Foot Traffic */}
         <div style={{ borderRadius: 8, border: '1px solid #e6e7ea', backgroundColor: '#fff', padding: '14px 16px' }}>
           <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: '#636d83', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Foot Traffic</p>
           <p style={{ fontFamily: ff, fontSize: 22, fontWeight: 700, color: '#0070f2', margin: '0 0 3px', lineHeight: 1 }}>+18%</p>
           <p style={{ fontFamily: ff, fontSize: 11, color: '#636d83', margin: 0 }}>by noon</p>
         </div>
-        {/* Stock Risk */}
         <div style={{ borderRadius: 8, border: '1px solid #e6e7ea', backgroundColor: '#fff', padding: '14px 16px' }}>
           <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: '#636d83', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Stock Risk</p>
           <p style={{ fontFamily: ff, fontSize: 22, fontWeight: 700, color: '#d9291c', margin: '0 0 3px', lineHeight: 1 }}>4</p>
           <p style={{ fontFamily: ff, fontSize: 11, color: '#d9291c', margin: 0 }}>items &lt; 2 hrs</p>
         </div>
-        {/* Staffing */}
         <div style={{ borderRadius: 8, border: '1px solid #e6e7ea', backgroundColor: '#fff', padding: '14px 16px' }}>
           <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: '#636d83', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Staffing</p>
           <p style={{ fontFamily: ff, fontSize: 22, fontWeight: 700, color: '#e76500', margin: '0 0 3px', lineHeight: 1 }}>−2</p>
           <p style={{ fontFamily: ff, fontSize: 11, color: '#e76500', margin: 0 }}>call-outs 5–7 PM</p>
         </div>
-        {/* Next Delivery */}
         <div style={{ borderRadius: 8, border: '1px solid #e6e7ea', backgroundColor: '#fff', padding: '14px 16px' }}>
           <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: '#636d83', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Next Delivery</p>
           <p style={{ fontFamily: ff, fontSize: 22, fontWeight: 700, color: '#0b0c0f', margin: '0 0 3px', lineHeight: 1 }}>11:30</p>
@@ -494,37 +492,90 @@ const CommandCenter = ({ associates, onAddTask }: { associates: Associate[]; onA
         </div>
       </div>
 
-      {/* ── Actionable Alerts ── */}
+      {/* ── Actionable Alerts — expandable ── */}
       <div style={{ borderRadius: 10, border: '1px solid #f5c2c2', backgroundColor: '#fff', overflow: 'hidden', marginBottom: 20 }}>
         <div style={{ padding: '10px 16px', borderBottom: '1px solid #f0f2f4', display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#d9291c', display: 'inline-block', flexShrink: 0 }} />
           <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#d9291c', margin: 0, flex: 1 }}>Actionable Alerts</p>
           <span style={{ fontFamily: ff, fontSize: 11, color: '#636d83' }}>{actionableAlerts.length} require action</span>
         </div>
-        {actionableAlerts.map((a, i, arr) => (
-          <div key={a.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: i < arr.length - 1 ? '1px solid #f0f2f4' : 'none' }}>
-            <span style={{
-              padding: '2px 7px', borderRadius: 4, fontSize: 11, fontWeight: 700, fontFamily: ff, flexShrink: 0,
-              backgroundColor: a.severity === 'Critical' ? 'rgba(217,41,28,0.08)' : 'rgba(231,101,0,0.08)',
-              color: a.severity === 'Critical' ? '#d9291c' : '#e76500',
-            }}>{a.severity}</span>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#0b0c0f', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.product}</p>
-              <p style={{ fontFamily: ff, fontSize: 11, color: '#636d83', margin: '1px 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.issue}</p>
+        {actionableAlerts.map((a) => {
+          const isExpanded = expandedId === a.id;
+          const isAccepted = acceptedIds.has(a.id);
+          const cfg = SEVERITY_CFG[a.severity];
+          return (
+            <div key={a.id} style={{ borderBottom: '1px solid #f0f2f4' }}>
+              {/* Clickable row */}
+              <div
+                onClick={() => setExpandedId(isExpanded ? null : a.id)}
+                style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', cursor: 'pointer', backgroundColor: isExpanded ? '#fafbfc' : '#fff', transition: 'background 0.1s' }}
+              >
+                <span style={{ padding: '2px 7px', borderRadius: 4, fontSize: 11, fontWeight: 700, fontFamily: ff, flexShrink: 0, backgroundColor: cfg.bg, color: cfg.color }}>{a.severity}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#0b0c0f', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.product}</p>
+                  <p style={{ fontFamily: ff, fontSize: 11, color: '#636d83', margin: '1px 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.issue}</p>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                  {isAccepted && <span style={{ padding: '2px 7px', borderRadius: 4, fontSize: 11, fontWeight: 600, fontFamily: ff, backgroundColor: 'rgba(25,132,80,0.08)', color: '#198450' }}>Task Added</span>}
+                  {a.assignee && <span style={{ fontFamily: ff, fontSize: 11, color: '#9fa8b4' }}>{a.assignee}</span>}
+                  <span style={{ padding: '2px 7px', borderRadius: 4, fontSize: 11, fontWeight: 600, fontFamily: ff, backgroundColor: a.status === 'In Progress' ? 'rgba(0,112,242,0.08)' : 'rgba(231,101,0,0.08)', color: a.status === 'In Progress' ? '#0070f2' : '#e76500' }}>{a.status}</span>
+                  <span style={{ fontFamily: ff, fontSize: 11, color: '#9fa8b4' }}>{a.time}</span>
+                  <ChevronRight size={13} style={{ color: '#9fa8b4', transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }} />
+                </div>
+              </div>
+              {/* Expanded detail */}
+              {isExpanded && (
+                <div style={{ padding: '0 16px 14px', backgroundColor: '#fafbfc', borderTop: '1px solid #f0f2f4' }}>
+                  <div style={{ paddingTop: 12, marginBottom: 10 }}>
+                    <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 700, color: '#636d83', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.4px' }}>What's happening</p>
+                    <p style={{ fontFamily: ff, fontSize: 13, color: '#0b0c0f', margin: 0, lineHeight: '1.5' }}>{a.detail}</p>
+                  </div>
+                  <div style={{ backgroundColor: '#f3efff', border: '1px solid #c5a9f5', borderRadius: 8, padding: '10px 12px', marginBottom: 12 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
+                      <span style={{ fontSize: 12 }}>✦</span>
+                      <span style={{ fontFamily: ff, fontSize: 11, fontWeight: 700, color: '#552cff', textTransform: 'uppercase', letterSpacing: '0.4px' }}>Joule's Recommendation</span>
+                    </div>
+                    <p style={{ fontFamily: ff, fontSize: 12, color: '#2d1f5e', margin: 0, lineHeight: '1.5' }}>{a.recommendation}</p>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    {!isAccepted ? (
+                      <button
+                        onClick={() => setModalAlert(a)}
+                        style={{ padding: '7px 14px', borderRadius: 7, border: 'none', backgroundColor: '#0070f2', color: '#fff', fontFamily: ff, fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5 }}
+                      >
+                        <CheckSquare size={13} /> Accept Suggestion
+                      </button>
+                    ) : (
+                      <span style={{ fontFamily: ff, fontSize: 12, color: '#198450', display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <CheckCircle2 size={13} /> Task added to board
+                      </span>
+                    )}
+                    <button onClick={() => setExpandedId(null)} style={{ padding: '7px 12px', borderRadius: 7, border: '1px solid #e6e7ea', background: '#fff', fontFamily: ff, fontSize: 12, color: '#556170', cursor: 'pointer' }}>
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-              {a.assignee && <span style={{ fontFamily: ff, fontSize: 11, color: '#9fa8b4' }}>{a.assignee}</span>}
-              <span style={{
-                padding: '2px 7px', borderRadius: 4, fontSize: 11, fontWeight: 600, fontFamily: ff,
-                backgroundColor: a.status === 'In Progress' ? 'rgba(0,112,242,0.08)' : 'rgba(231,101,0,0.08)',
-                color: a.status === 'In Progress' ? '#0070f2' : '#e76500',
-              }}>{a.status}</span>
-              <span style={{ fontFamily: ff, fontSize: 11, color: '#9fa8b4' }}>{a.time}</span>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
+      {/* Prefilled task modal */}
+      {modalAlert && (
+        <AddTaskModal
+          employees={taskBoard}
+          prefillTitle={modalAlert.suggestedTask}
+          prefillNote={modalAlert.recommendation}
+          onClose={() => setModalAlert(null)}
+          onAdd={(task, empId) => {
+            onAddTask(task, empId);
+            setAcceptedIds(prev => new Set(prev).add(modalAlert.id));
+            setModalAlert(null);
+            toast.success('Task added to board');
+          }}
+        />
+      )}
     </div>
   );
 };
@@ -1248,7 +1299,7 @@ const initialTaskBoard: EmployeeColumn[] = [
 /* ══════════════════════════════════════════════════════
    PERSONALIZATION / MY DAY SECTION
 ══════════════════════════════════════════════════════ */
-const MyDaySection = ({ associates, onAddTask }: { associates: Associate[]; onAddTask: (task: EmployeeTask, employeeId: string) => void }) => (
+const MyDaySection = ({ associates, onAddTask, taskBoard }: { associates: Associate[]; onAddTask: (task: EmployeeTask, employeeId: string) => void; taskBoard: EmployeeColumn[] }) => (
   <div>
     {/* Greeting */}
     <div style={{ padding: '32px 80px 0' }}>
@@ -1264,7 +1315,7 @@ const MyDaySection = ({ associates, onAddTask }: { associates: Associate[]; onAd
         Store Manager Dashboard — FreshMart Midtown
       </h1>
     </div>
-    <CommandCenter associates={associates} onAddTask={onAddTask} />
+    <CommandCenter associates={associates} onAddTask={onAddTask} taskBoard={taskBoard} />
   </div>
 );
 
@@ -2167,7 +2218,7 @@ const FloorplanSection = () => {
   );
 };
 /* ══════════════════════════════════════════════════════
-   ALERTS TAB
+   NOTIFICATIONS TAB
 ══════════════════════════════════════════════════════ */
 const SEVERITY_CFG: Record<AlertSeverity, { color: string; bg: string }> = {
   Critical: { color: '#d9291c', bg: 'rgba(217,41,28,0.08)' },
@@ -2176,92 +2227,134 @@ const SEVERITY_CFG: Record<AlertSeverity, { color: string; bg: string }> = {
   Resolved: { color: '#198450', bg: 'rgba(25,132,80,0.08)' },
 };
 
-const AlertsTab = ({ alerts, onAddTask, taskBoard }: { alerts: StoreAlert[]; onAddTask: (task: EmployeeTask, employeeId: string) => void; taskBoard: EmployeeColumn[] }) => {
+interface NotificationItem {
+  id: string;
+  type: 'task_added' | 'task_redistributed' | 'task_completed' | 'delivery_verified' | 'sign_off';
+  title: string;
+  detail: string;
+  actor: string;
+  time: string;
+  read: boolean;
+}
+
+const NOTIFICATIONS: NotificationItem[] = [
+  {
+    id: 'N1',
+    type: 'sign_off',
+    title: 'Alex T. signed off early',
+    detail: '3 open tasks in Zone C were unresolved at sign-off.',
+    actor: 'Alex T.',
+    time: '10:58 AM',
+    read: false,
+  },
+  {
+    id: 'N2',
+    type: 'task_redistributed',
+    title: 'Task redistributed to Jordan M.',
+    detail: '"Submit reorder for Baby Spinach" moved from Alex T. — Joule suggested reassignment.',
+    actor: 'Joule',
+    time: '10:59 AM',
+    read: false,
+  },
+  {
+    id: 'N3',
+    type: 'task_redistributed',
+    title: '2 tasks redistributed to Sam K.',
+    detail: '"Apply markdown — Heirloom Tomatoes" and "Cull damaged blackberries" moved from Alex T.',
+    actor: 'Joule',
+    time: '10:59 AM',
+    read: false,
+  },
+  {
+    id: 'N4',
+    type: 'task_completed',
+    title: 'Jordan M. completed a task',
+    detail: '"Restock Organic Bananas — 2 cases on Shelf 1A" marked done.',
+    actor: 'Jordan M.',
+    time: '10:35 AM',
+    read: true,
+  },
+  {
+    id: 'N5',
+    type: 'task_added',
+    title: 'New task added to Sam K.',
+    detail: '"Verify 3 unscanned delivery items" added by store manager — due 11:30 AM.',
+    actor: 'Store Manager',
+    time: '10:20 AM',
+    read: true,
+  },
+  {
+    id: 'N6',
+    type: 'delivery_verified',
+    title: 'Morning delivery verified',
+    detail: 'Sam K. confirmed receipt of 14 items. 3 items remain unverified.',
+    actor: 'Sam K.',
+    time: '9:15 AM',
+    read: true,
+  },
+  {
+    id: 'N7',
+    type: 'task_completed',
+    title: 'Jordan M. completed a task',
+    detail: '"Morning produce rotation — Zone A" marked done.',
+    actor: 'Jordan M.',
+    time: '9:02 AM',
+    read: true,
+  },
+];
+
+const NOTIF_TYPE_CFG: Record<NotificationItem['type'], { icon: React.ReactNode; color: string; bg: string; label: string }> = {
+  task_added:        { icon: <Plus size={13} />,        color: '#0070f2', bg: 'rgba(0,112,242,0.08)',   label: 'Task Added'        },
+  task_redistributed:{ icon: <Users size={13} />,       color: '#552cff', bg: 'rgba(85,44,255,0.08)',   label: 'Redistributed'     },
+  task_completed:    { icon: <CheckCircle2 size={13} />, color: '#198450', bg: 'rgba(25,132,80,0.08)',  label: 'Completed'         },
+  delivery_verified: { icon: <Package size={13} />,     color: '#198450', bg: 'rgba(25,132,80,0.08)',   label: 'Delivery Verified' },
+  sign_off:          { icon: <AlertCircle size={13} />, color: '#e76500', bg: 'rgba(231,101,0,0.08)',   label: 'Sign-off'          },
+};
+
+const NotificationsTab = () => {
   const ff = '"72","72full",Arial,Helvetica,sans-serif';
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [modalAlert, setModalAlert] = useState<StoreAlert | null>(null);
-  const [acceptedIds, setAcceptedIds] = useState<Set<string>>(new Set());
+  const [readIds, setReadIds] = useState<Set<string>>(new Set(NOTIFICATIONS.filter(n => n.read).map(n => n.id)));
 
-  const open     = alerts.filter(a => a.status !== 'Done');
-  const resolved = alerts.filter(a => a.status === 'Done');
+  const unread = NOTIFICATIONS.filter(n => !readIds.has(n.id));
+  const earlier = NOTIFICATIONS.filter(n => readIds.has(n.id));
 
-  const AlertRow = ({ a }: { a: StoreAlert }) => {
-    const cfg = SEVERITY_CFG[a.severity];
-    const isExpanded = expandedId === a.id;
-    const isAccepted = acceptedIds.has(a.id);
+  const markRead = (id: string) => setReadIds(prev => new Set(prev).add(id));
+  const markAllRead = () => setReadIds(new Set(NOTIFICATIONS.map(n => n.id)));
 
+  const NotifRow = ({ n }: { n: NotificationItem }) => {
+    const cfg = NOTIF_TYPE_CFG[n.type];
+    const isUnread = !readIds.has(n.id);
     return (
-      <div style={{ borderBottom: '1px solid #f0f2f4' }}>
-        {/* Row header — clickable */}
-        <div
-          onClick={() => setExpandedId(isExpanded ? null : a.id)}
-          style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', cursor: 'pointer', backgroundColor: isExpanded ? '#fafbfc' : '#fff', transition: 'background 0.1s' }}
-        >
-          <span style={{ padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700, fontFamily: ff, flexShrink: 0, backgroundColor: cfg.bg, color: cfg.color }}>{a.severity}</span>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-              <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 600, color: '#0b0c0f', margin: 0 }}>{a.product}</p>
-              <span style={{ fontFamily: ff, fontSize: 11, color: '#9fa8b4' }}>{a.zone} · {a.time}</span>
-            </div>
-            <p style={{ fontFamily: ff, fontSize: 12, color: '#556170', margin: '2px 0 0' }}>{a.issue}</p>
+      <div
+        onClick={() => markRead(n.id)}
+        style={{
+          display: 'flex', alignItems: 'flex-start', gap: 12,
+          padding: '14px 20px',
+          borderBottom: '1px solid #f0f2f4',
+          backgroundColor: isUnread ? '#fafbff' : '#fff',
+          cursor: isUnread ? 'pointer' : 'default',
+          transition: 'background 0.1s',
+        }}
+      >
+        {/* Icon */}
+        <div style={{ width: 32, height: 32, borderRadius: '50%', backgroundColor: cfg.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, color: cfg.color, marginTop: 1 }}>
+          {cfg.icon}
+        </div>
+        {/* Content */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 2 }}>
+            <p style={{ fontFamily: ff, fontSize: 13, fontWeight: isUnread ? 700 : 500, color: '#0b0c0f', margin: 0, lineHeight: '18px' }}>{n.title}</p>
+            <span style={{ fontFamily: ff, fontSize: 11, color: '#9fa8b4', whiteSpace: 'nowrap', flexShrink: 0 }}>{n.time}</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-            {isAccepted && (
-              <span style={{ padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 600, fontFamily: ff, backgroundColor: 'rgba(25,132,80,0.08)', color: '#198450' }}>Task Added</span>
-            )}
-            {a.assignee && <span style={{ fontFamily: ff, fontSize: 11, color: '#9fa8b4' }}>{a.assignee}</span>}
-            <span style={{
-              padding: '2px 7px', borderRadius: 4, fontSize: 11, fontWeight: 600, fontFamily: ff,
-              backgroundColor: a.status === 'In Progress' ? 'rgba(0,112,242,0.08)' : 'rgba(231,101,0,0.08)',
-              color: a.status === 'In Progress' ? '#0070f2' : '#e76500',
-            }}>{a.status}</span>
-            <ChevronRight size={14} style={{ color: '#9fa8b4', transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }} />
+          <p style={{ fontFamily: ff, fontSize: 12, color: '#556170', margin: 0, lineHeight: '1.5' }}>{n.detail}</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 6 }}>
+            <span style={{ padding: '1px 7px', borderRadius: 10, fontSize: 10, fontWeight: 700, fontFamily: ff, backgroundColor: cfg.bg, color: cfg.color }}>{cfg.label}</span>
+            <span style={{ fontFamily: ff, fontSize: 11, color: '#9fa8b4' }}>by {n.actor}</span>
           </div>
         </div>
-
-        {/* Expanded detail + recommendation */}
-        {isExpanded && (
-          <div style={{ padding: '0 20px 16px 20px', backgroundColor: '#fafbfc', borderTop: '1px solid #f0f2f4' }}>
-            {/* Detail */}
-            <div style={{ marginBottom: 12, paddingTop: 12 }}>
-              <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 700, color: '#636d83', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.4px' }}>What's happening</p>
-              <p style={{ fontFamily: ff, fontSize: 13, color: '#0b0c0f', margin: 0, lineHeight: '1.5' }}>{a.detail}</p>
-            </div>
-            {/* Joule recommendation */}
-            <div style={{ backgroundColor: '#f3efff', border: '1px solid #c5a9f5', borderRadius: 8, padding: '12px 14px', marginBottom: 14 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
-                <span style={{ fontSize: 13 }}>✦</span>
-                <span style={{ fontFamily: ff, fontSize: 11, fontWeight: 700, color: '#552cff', textTransform: 'uppercase', letterSpacing: '0.4px' }}>Joule's Recommendation</span>
-              </div>
-              <p style={{ fontFamily: ff, fontSize: 13, color: '#2d1f5e', margin: 0, lineHeight: '1.5' }}>{a.recommendation}</p>
-            </div>
-            {/* Actions */}
-            <div style={{ display: 'flex', gap: 8 }}>
-              {!isAccepted ? (
-                <button
-                  onClick={() => setModalAlert(a)}
-                  style={{
-                    padding: '8px 18px', borderRadius: 8, border: 'none',
-                    backgroundColor: '#0070f2', color: '#fff',
-                    fontFamily: ff, fontSize: 13, fontWeight: 600, cursor: 'pointer',
-                    display: 'flex', alignItems: 'center', gap: 6,
-                  }}
-                >
-                  <CheckSquare size={14} /> Accept Suggestion
-                </button>
-              ) : (
-                <span style={{ fontFamily: ff, fontSize: 12, color: '#198450', display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <CheckCircle2 size={14} /> Task added to board
-                </span>
-              )}
-              <button
-                onClick={() => setExpandedId(null)}
-                style={{ padding: '8px 14px', borderRadius: 8, border: '1px solid #e6e7ea', background: '#fff', fontFamily: ff, fontSize: 13, color: '#556170', cursor: 'pointer' }}
-              >
-                Dismiss
-              </button>
-            </div>
-          </div>
+        {/* Unread dot */}
+        {isUnread && (
+          <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#0057d2', flexShrink: 0, marginTop: 5 }} />
         )}
       </div>
     );
@@ -2269,46 +2362,48 @@ const AlertsTab = ({ alerts, onAddTask, taskBoard }: { alerts: StoreAlert[]; onA
 
   return (
     <div style={{ padding: '32px 80px' }}>
-      <h2 style={{ fontFamily: ff, fontSize: 20, fontWeight: 600, color: '#0b0c0f', margin: '0 0 20px' }}>Alerts & Notifications</h2>
-
-      {/* Open alerts */}
-      <div style={{ borderRadius: 10, border: '1px solid #e6e7ea', backgroundColor: '#fff', marginBottom: 24, overflow: 'hidden' }}>
-        <div style={{ padding: '12px 20px', borderBottom: '1px solid #f0f2f4', display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#d9291c', display: 'inline-block' }} />
-          <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#0b0c0f', margin: 0, flex: 1 }}>Open Alerts</p>
-          <span style={{ fontFamily: ff, fontSize: 11, color: '#636d83' }}>{open.length} items — click to expand</span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 }}>
+        <div>
+          <h2 style={{ fontFamily: ff, fontSize: 20, fontWeight: 600, color: '#0b0c0f', margin: '0 0 3px' }}>Notifications</h2>
+          <p style={{ fontFamily: ff, fontSize: 13, color: '#636d83', margin: 0 }}>Task changes, reassignments and shift activity</p>
         </div>
-        {open.map(a => <AlertRow key={a.id} a={a} />)}
-        {open.length === 0 && (
-          <p style={{ fontFamily: ff, fontSize: 13, color: '#9fa8b4', padding: '20px', margin: 0, textAlign: 'center' }}>No open alerts</p>
+        {unread.length > 0 && (
+          <button
+            onClick={markAllRead}
+            style={{ padding: '7px 14px', borderRadius: 7, border: '1px solid #e6e7ea', background: '#fff', fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#556170', cursor: 'pointer' }}
+          >
+            Mark all as read
+          </button>
         )}
       </div>
 
-      {/* Resolved */}
-      {resolved.length > 0 && (
-        <div style={{ borderRadius: 10, border: '1px solid #e6e7ea', backgroundColor: '#fff', overflow: 'hidden' }}>
-          <div style={{ padding: '12px 20px', borderBottom: '1px solid #f0f2f4', display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#198450', display: 'inline-block' }} />
-            <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#0b0c0f', margin: 0 }}>Resolved</p>
+      {/* Unread */}
+      {unread.length > 0 && (
+        <div style={{ borderRadius: 10, border: '1px solid #c8d8ff', backgroundColor: '#fff', marginBottom: 20, overflow: 'hidden' }}>
+          <div style={{ padding: '10px 20px', borderBottom: '1px solid #f0f2f4', display: 'flex', alignItems: 'center', gap: 8, backgroundColor: '#f5f7ff' }}>
+            <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#0057d2', display: 'inline-block' }} />
+            <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#0057d2', margin: 0, flex: 1 }}>New</p>
+            <span style={{ fontFamily: ff, fontSize: 11, color: '#636d83' }}>{unread.length} unread</span>
           </div>
-          {resolved.map(a => <AlertRow key={a.id} a={a} />)}
+          {unread.map(n => <NotifRow key={n.id} n={n} />)}
         </div>
       )}
 
-      {/* Prefilled task modal */}
-      {modalAlert && (
-        <AddTaskModal
-          employees={taskBoard}
-          prefillTitle={modalAlert.suggestedTask}
-          prefillNote={modalAlert.recommendation}
-          onClose={() => setModalAlert(null)}
-          onAdd={(task, empId) => {
-            onAddTask(task, empId);
-            setAcceptedIds(prev => new Set(prev).add(modalAlert.id));
-            setModalAlert(null);
-            toast.success('Task added to board');
-          }}
-        />
+      {/* Earlier */}
+      {earlier.length > 0 && (
+        <div style={{ borderRadius: 10, border: '1px solid #e6e7ea', backgroundColor: '#fff', overflow: 'hidden' }}>
+          <div style={{ padding: '10px 20px', borderBottom: '1px solid #f0f2f4', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#636d83', margin: 0 }}>Earlier today</p>
+          </div>
+          {earlier.map(n => <NotifRow key={n.id} n={n} />)}
+        </div>
+      )}
+
+      {unread.length === 0 && earlier.length === 0 && (
+        <div style={{ textAlign: 'center', padding: '60px 0' }}>
+          <CheckCircle2 size={32} style={{ color: '#c4c9d4', margin: '0 auto 10px' }} />
+          <p style={{ fontFamily: ff, fontSize: 14, color: '#9fa8b4', margin: 0 }}>No notifications</p>
+        </div>
       )}
     </div>
   );
@@ -2514,7 +2609,7 @@ const StoreManagerSpacePage = () => {
           {activeTab === 'Overview' && (
             <>
               {/* 1. Personalized My Day */}
-              <MyDaySection associates={initialAssociates} onAddTask={handleAddTask} />
+              <MyDaySection associates={initialAssociates} onAddTask={handleAddTask} taskBoard={taskBoard} />
 
               {/* Divider */}
               <div style={{ margin: '40px 80px 0', height: 1, backgroundColor: '#e6e7ea' }} />
@@ -2528,8 +2623,8 @@ const StoreManagerSpacePage = () => {
             <FloorplanSection />
           )}
 
-          {activeTab === 'Alerts & Notifications' && (
-            <AlertsTab alerts={alerts} onAddTask={handleAddTask} taskBoard={taskBoard} />
+          {activeTab === 'Notifications' && (
+            <NotificationsTab />
           )}
 
           {activeTab === 'Team' && (
