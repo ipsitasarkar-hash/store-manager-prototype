@@ -198,7 +198,7 @@ const ChatPaneIcon = () => (
   </svg>
 );
 
-const SpaceHeader = () => (
+const SpaceHeader = ({ chatOpen, onToggleChat }: { chatOpen: boolean; onToggleChat: () => void }) => (
   /* PaneBar — matches Figma px-[24px] py-[20px] */
   <div
     className="flex items-center justify-between shrink-0 relative z-10"
@@ -232,8 +232,9 @@ const SpaceHeader = () => (
         <DotsIcon />
       </button>
       <button
+        onClick={onToggleChat}
         className="flex items-center justify-center rounded-lg transition-colors"
-        style={{ padding: 10.855, borderRadius: 8, backgroundColor: '#e5ecf5' }}
+        style={{ padding: 10.855, borderRadius: 8, backgroundColor: chatOpen ? '#e5ecf5' : 'transparent' }}
       >
         <ChatPaneIcon />
       </button>
@@ -976,12 +977,6 @@ const SpaceChatPanel = ({
             </span>
           </div>
         </div>
-        <button
-          className="flex items-center justify-center rounded-lg hover:bg-[#f0f2f4] transition-colors shrink-0"
-          style={{ padding: 10.855, borderRadius: 8 }}
-        >
-          <Plus size={18} style={{ color: '#0b0c0f' }} />
-        </button>
       </div>
 
       {/* Space created notification */}
@@ -2086,7 +2081,7 @@ const StoreManagerSpacePage = () => {
           boxShadow: '0px 22px 14px 0px rgba(0,0,0,0.06), 0px 182px 111px 0px rgba(0,0,0,0.05)',
         }}
       >
-        <SpaceHeader />
+        <SpaceHeader chatOpen={chatOpen} onToggleChat={() => setChatOpen(o => !o)} />
 
         {/* ── Alex sign-off notification banner ── */}
         {showNotification && !reassigned && (
