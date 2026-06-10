@@ -423,57 +423,38 @@ const PriorityItem = ({ item, onAddTask }: { item: AIPriority; onAddTask: (task:
 };
 
 const CommandCenter = ({ associates, onAddTask }: { associates: Associate[]; onAddTask: (task: EmployeeTask, employeeId: string) => void }) => {
-  const criticals    = AI_PRIORITIES.filter(p => p.level === 'critical');
-  const importants   = AI_PRIORITIES.filter(p => p.level === 'important');
-  const opportunities = AI_PRIORITIES.filter(p => p.level === 'opportunity');
-  const [showAlerts, setShowAlerts] = useState(false);
-
+  const criticals = AI_PRIORITIES.filter(p => p.level === 'critical');
   const ff = '"72","72full",Arial,Helvetica,sans-serif';
 
   return (
     <div style={{ padding: '32px 80px 0' }}>
 
       {/* ── Row 1: KPIs ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: 12, marginBottom: 20 }}>
-
-        {/* Open Alerts — clickable */}
-        <div
-          onClick={() => setShowAlerts(o => !o)}
-          style={{ borderRadius: 8, border: `1px solid ${showAlerts ? '#d9291c' : '#e6e7ea'}`, backgroundColor: showAlerts ? '#fff5f5' : '#fff', padding: '14px 16px', cursor: 'pointer', transition: 'all 0.15s' }}
-        >
-          <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: '#636d83', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Open Alerts</p>
-          <p style={{ fontFamily: ff, fontSize: 22, fontWeight: 700, color: '#d9291c', margin: '0 0 3px', lineHeight: 1 }}>5</p>
-          <p style={{ fontFamily: ff, fontSize: 11, color: '#d9291c', margin: 0 }}>3 critical ↓</p>
-        </div>
-
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 12, marginBottom: 20 }}>
         {/* Tasks Complete */}
         <div style={{ borderRadius: 8, border: '1px solid #e6e7ea', backgroundColor: '#fff', padding: '14px 16px' }}>
           <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: '#636d83', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Tasks Complete</p>
           <p style={{ fontFamily: ff, fontSize: 22, fontWeight: 700, color: '#0b0c0f', margin: '0 0 3px', lineHeight: 1 }}>4 / 12</p>
           <p style={{ fontFamily: ff, fontSize: 11, color: '#636d83', margin: 0 }}>33% shift done</p>
         </div>
-
         {/* Foot Traffic */}
         <div style={{ borderRadius: 8, border: '1px solid #e6e7ea', backgroundColor: '#fff', padding: '14px 16px' }}>
           <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: '#636d83', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Foot Traffic</p>
           <p style={{ fontFamily: ff, fontSize: 22, fontWeight: 700, color: '#0070f2', margin: '0 0 3px', lineHeight: 1 }}>+18%</p>
           <p style={{ fontFamily: ff, fontSize: 11, color: '#636d83', margin: 0 }}>by noon</p>
         </div>
-
         {/* Stock Risk */}
         <div style={{ borderRadius: 8, border: '1px solid #e6e7ea', backgroundColor: '#fff', padding: '14px 16px' }}>
           <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: '#636d83', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Stock Risk</p>
           <p style={{ fontFamily: ff, fontSize: 22, fontWeight: 700, color: '#d9291c', margin: '0 0 3px', lineHeight: 1 }}>4</p>
           <p style={{ fontFamily: ff, fontSize: 11, color: '#d9291c', margin: 0 }}>items &lt; 2 hrs</p>
         </div>
-
         {/* Staffing */}
         <div style={{ borderRadius: 8, border: '1px solid #e6e7ea', backgroundColor: '#fff', padding: '14px 16px' }}>
           <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: '#636d83', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Staffing</p>
           <p style={{ fontFamily: ff, fontSize: 22, fontWeight: 700, color: '#e76500', margin: '0 0 3px', lineHeight: 1 }}>−2</p>
           <p style={{ fontFamily: ff, fontSize: 11, color: '#e76500', margin: 0 }}>call-outs 5–7 PM</p>
         </div>
-
         {/* Next Delivery */}
         <div style={{ borderRadius: 8, border: '1px solid #e6e7ea', backgroundColor: '#fff', padding: '14px 16px' }}>
           <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: '#636d83', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Next Delivery</p>
@@ -482,67 +463,41 @@ const CommandCenter = ({ associates, onAddTask }: { associates: Associate[]; onA
         </div>
       </div>
 
-      {/* ── Open Alerts flyout ── */}
-      {showAlerts && (
-        <div style={{ marginBottom: 20, borderRadius: 10, border: '1px solid #f5c2c2', backgroundColor: '#fff', overflow: 'hidden' }}>
-          <div style={{ padding: '12px 16px 8px', borderBottom: '1px solid #f0f2f4', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#d9291c', margin: 0 }}>Open Alerts</p>
-            <button onClick={() => setShowAlerts(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#636d83', display: 'flex', padding: 2 }}><X size={14} /></button>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {initialAlerts.filter(a => a.status !== 'Done').map((a, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: i < initialAlerts.filter(x => x.status !== 'Done').length - 1 ? '1px solid #f0f2f4' : 'none' }}>
+      {/* ── Open Alerts + Critical AI Priorities combined card ── */}
+      <div style={{ borderRadius: 10, border: '1px solid #f5c2c2', backgroundColor: '#fff', overflow: 'hidden', marginBottom: 20 }}>
+        {/* Header */}
+        <div style={{ padding: '12px 16px', borderBottom: '1px solid #f0f2f4', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#d9291c', display: 'inline-block', flexShrink: 0 }} />
+          <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#d9291c', margin: 0, flex: 1 }}>Open Alerts & Critical Priorities</p>
+          <span style={{ fontFamily: ff, fontSize: 11, color: '#636d83' }}>{initialAlerts.filter(a => a.status !== 'Done').length} alerts · {criticals.length} critical</span>
+        </div>
+
+        {/* Two-column layout: alerts left, critical priorities right */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+          {/* Alerts column */}
+          <div style={{ borderRight: '1px solid #f0f2f4' }}>
+            {initialAlerts.filter(a => a.status !== 'Done').map((a, i, arr) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: i < arr.length - 1 ? '1px solid #f0f2f4' : 'none' }}>
                 <span style={{
-                  padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700, fontFamily: ff,
+                  padding: '2px 7px', borderRadius: 4, fontSize: 11, fontWeight: 700, fontFamily: ff, flexShrink: 0,
                   backgroundColor: a.severity === 'Critical' ? 'rgba(217,41,28,0.08)' : 'rgba(231,101,0,0.08)',
                   color: a.severity === 'Critical' ? '#d9291c' : '#e76500',
-                  flexShrink: 0,
                 }}>{a.severity}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 600, color: '#0b0c0f', margin: 0 }}>{a.product}</p>
-                  <p style={{ fontFamily: ff, fontSize: 11, color: '#636d83', margin: '1px 0 0' }}>{a.issue}</p>
+                  <p style={{ fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#0b0c0f', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.product}</p>
+                  <p style={{ fontFamily: ff, fontSize: 11, color: '#636d83', margin: '1px 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.issue}</p>
                 </div>
-                <span style={{ fontFamily: ff, fontSize: 11, color: '#636d83', flexShrink: 0 }}>{a.zone} · {a.time}</span>
+                <span style={{ fontFamily: ff, fontSize: 11, color: '#9fa8b4', flexShrink: 0 }}>{a.time}</span>
               </div>
             ))}
           </div>
-        </div>
-      )}
 
-      {/* ── Row 2: AI Priorities full width ── */}
-      <div style={{ marginBottom: 20 }}>
-        <div style={{ borderRadius: 8, border: '1.5px solid rgba(93,54,255,0.2)', backgroundColor: '#fdfcff', padding: '16px 18px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'linear-gradient(135deg,#BA79EF,#470CED)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <Zap size={11} className="text-white" />
-            </div>
-            <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#0b0c0f', margin: 0 }}>AI Priorities</p>
-            <span style={{ marginLeft: 'auto', fontFamily: ff, fontSize: 11, color: '#636d83' }}>Click to expand</span>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
-            <div>
-              <p style={{ fontFamily: ff, fontSize: 10, fontWeight: 700, color: '#d9291c', textTransform: 'uppercase', letterSpacing: '0.6px', margin: '0 0 4px' }}>🔴 Critical</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {criticals.map((item, i) => <PriorityItem key={i} item={item} onAddTask={onAddTask} />)}
-              </div>
-            </div>
-            <div>
-              <p style={{ fontFamily: ff, fontSize: 10, fontWeight: 700, color: '#e76500', textTransform: 'uppercase', letterSpacing: '0.6px', margin: '0 0 4px' }}>🟠 Important</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {importants.map((item, i) => <PriorityItem key={i} item={item} onAddTask={onAddTask} />)}
-              </div>
-            </div>
-            <div>
-              <p style={{ fontFamily: ff, fontSize: 10, fontWeight: 700, color: '#198450', textTransform: 'uppercase', letterSpacing: '0.6px', margin: '0 0 4px' }}>🟢 Opportunity</p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                {opportunities.map((item, i) => <PriorityItem key={i} item={item} onAddTask={onAddTask} />)}
-              </div>
-            </div>
+          {/* Critical AI priorities column */}
+          <div style={{ padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {criticals.map((item, i) => <PriorityItem key={i} item={item} onAddTask={onAddTask} />)}
           </div>
         </div>
       </div>
-
 
     </div>
   );
@@ -1966,6 +1921,32 @@ const FloorplanModal = ({ onClose }: { onClose: () => void }) => {
   );
 };
 
+const AISuggestionsSection = ({ onAddTask }: { onAddTask: (task: EmployeeTask, employeeId: string) => void }) => {
+  const ff = '"72","72full",Arial,Helvetica,sans-serif';
+  return (
+    <div style={{ padding: '40px 80px 0' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+        <span style={{ fontSize: 18 }}>✦</span>
+        <h2 style={{ fontFamily: ff, fontSize: 20, fontWeight: 600, color: '#0b0c0f', margin: 0 }}>
+          AI Suggestions
+        </h2>
+      </div>
+      <div style={{
+        borderRadius: 12,
+        border: '1.5px solid #c5a9f5',
+        backgroundColor: '#faf8ff',
+        overflow: 'hidden',
+      }}>
+        {AI_PRIORITIES.map((item, idx) => (
+          <div key={idx} style={{ borderTop: idx === 0 ? 'none' : '1px solid #ede8fc' }}>
+            <PriorityItem item={item} onAddTask={onAddTask} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const FloorplanSection = () => {
   const [open, setOpen] = useState(false);
   return (
@@ -2179,7 +2160,13 @@ const StoreManagerSpacePage = () => {
           {/* Divider */}
           <div style={{ margin: '0 80px', height: 1, backgroundColor: '#e6e7ea' }} />
 
-          {/* 3. Store Floorplan */}
+          {/* 3. AI Suggestions */}
+          <AISuggestionsSection onAddTask={handleAddTask} />
+
+          {/* Divider */}
+          <div style={{ margin: '40px 80px 0', height: 1, backgroundColor: '#e6e7ea' }} />
+
+          {/* 4. Store Floorplan */}
           <FloorplanSection />
         </div>
       </div>
