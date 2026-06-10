@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/store-manager-prototype/favicon.png" />
+    <title>The Floor: Store Manager</title>
+    <script>
+      (function(l) {
+        if (l.search[1] === '/' ) {
+          var decoded = l.search.slice(1).split('&').map(function(s) {
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+            l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location))
+    </script>
+    <meta name="description" content="EL: Invoicing" />
+    <meta name="author" content="SAP" />
+    <link href="https://experience.sap.com/fiori-design-web/wp-content/uploads/sites/5/2019/05/72-web.css" rel="stylesheet" />
+    <link rel="preload" as="image" href="/store-manager-prototype/assets/joule-logo-Cmof3zwh.png" />
+
+    <meta property="og:title" content="EL: Invoicing" />
+    <meta property="og:description" content="EL: Invoicing" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://engagement-layer.vercel.app/favicon.png" />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="EL: Invoicing" />
+    <meta name="twitter:image" content="https://engagement-layer.vercel.app/favicon.png" />
+    <script type="module" crossorigin src="/store-manager-prototype/assets/index-DDtkggu2.js"></script>
+    <link rel="stylesheet" crossorigin href="/store-manager-prototype/assets/index-DZbTR3O0.css">
+  </head>
+
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
