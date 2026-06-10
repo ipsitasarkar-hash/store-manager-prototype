@@ -2459,19 +2459,32 @@ const StoreManagerSpacePage = () => {
         </div>
       </div>
 
-      {/* ── Right Chat Pane — hidden when closed ── */}
+      {/* ── Right Chat Pane — collapses to icon tab when closed ── */}
       <div style={{
-        width: chatOpen ? 508 : 0,
+        width: chatOpen ? 508 : 48,
         flexShrink: 0,
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
         transition: 'width 0.3s cubic-bezier(0.4,0,0.2,1)',
         overflow: 'hidden',
-        borderLeft: chatOpen ? '1px solid #e6e7ea' : 'none',
+        borderLeft: '1px solid #e6e7ea',
         backgroundColor: '#f8f9fa',
+        position: 'relative',
       }}>
-        {/* Full chat panel */}
+        {/* Collapsed tab — icon only, no text */}
+        {!chatOpen && (
+          <button
+            onClick={() => setChatOpen(true)}
+            style={{
+              position: 'absolute', inset: 0, width: '100%', height: '100%',
+              background: 'none', border: 'none', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <ChatPaneIcon />
+          </button>
+        )}
         <div style={{ width: 508, height: '100%', flexShrink: 0 }}>
           <SpaceChatPanel
             alerts={alerts}
