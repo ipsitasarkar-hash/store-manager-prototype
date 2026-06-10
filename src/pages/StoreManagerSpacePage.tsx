@@ -198,7 +198,7 @@ const ChatPaneIcon = () => (
   </svg>
 );
 
-const SpaceHeader = ({ chatOpen, onToggleChat }: { chatOpen: boolean; onToggleChat: () => void }) => (
+const SpaceHeader = () => (
   /* PaneBar — matches Figma px-[24px] py-[20px] */
   <div
     className="flex items-center justify-between shrink-0 relative z-10"
@@ -230,13 +230,6 @@ const SpaceHeader = ({ chatOpen, onToggleChat }: { chatOpen: boolean; onToggleCh
         style={{ padding: 10.855, borderRadius: 8 }}
       >
         <DotsIcon />
-      </button>
-      <button
-        onClick={onToggleChat}
-        className="flex items-center justify-center rounded-lg transition-colors"
-        style={{ padding: 10.855, borderRadius: 8, backgroundColor: chatOpen ? '#e5ecf5' : 'transparent' }}
-      >
-        <ChatPaneIcon />
       </button>
     </div>
   </div>
@@ -2099,7 +2092,7 @@ const StoreManagerSpacePage = () => {
           boxShadow: '0px 22px 14px 0px rgba(0,0,0,0.06), 0px 182px 111px 0px rgba(0,0,0,0.05)',
         }}
       >
-        <SpaceHeader chatOpen={chatOpen} onToggleChat={() => setChatOpen(o => !o)} />
+        <SpaceHeader />
 
         {/* ── Alex sign-off notification banner ── */}
         {showNotification && !reassigned && (
