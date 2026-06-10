@@ -2171,39 +2171,19 @@ const StoreManagerSpacePage = () => {
         </div>
       </div>
 
-      {/* ── Right Chat Pane — collapses to a slim tab when closed ── */}
+      {/* ── Right Chat Pane — hidden when closed ── */}
       <div style={{
-        width: chatOpen ? 508 : 48,
+        width: chatOpen ? 508 : 0,
         flexShrink: 0,
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
         transition: 'width 0.3s cubic-bezier(0.4,0,0.2,1)',
         overflow: 'hidden',
-        borderLeft: '1px solid #e6e7ea',
+        borderLeft: chatOpen ? '1px solid #e6e7ea' : 'none',
         backgroundColor: '#f8f9fa',
-        position: 'relative',
       }}>
-        {/* Collapsed tab — visible when chat is closed */}
-        {!chatOpen && (
-          <button
-            onClick={() => setChatOpen(true)}
-            style={{
-              position: 'absolute', inset: 0, width: '100%', height: '100%',
-              background: 'none', border: 'none', cursor: 'pointer',
-              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
-            }}
-          >
-            <ChatPaneIcon />
-            <span style={{
-              fontFamily: ff, fontSize: 11, fontWeight: 600, color: '#636d83',
-              writingMode: 'vertical-rl', textOrientation: 'mixed', transform: 'rotate(180deg)',
-              letterSpacing: '0.5px',
-            }}>Chat</span>
-          </button>
-        )}
-
-        {/* Full chat panel — rendered but hidden width when collapsed */}
+        {/* Full chat panel */}
         <div style={{ width: 508, height: '100%', flexShrink: 0 }}>
           <SpaceChatPanel
             alerts={alerts}
