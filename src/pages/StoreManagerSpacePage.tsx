@@ -2521,18 +2521,6 @@ const StoreManagerSpacePage = () => {
 
               {/* 2. Task Board */}
               <TaskBoardSection taskBoard={taskBoard} onAddTask={handleAddTask} />
-
-              {/* Divider */}
-              <div style={{ margin: '0 80px', height: 1, backgroundColor: '#e6e7ea' }} />
-
-              {/* 3. AI Suggestions */}
-              <AISuggestionsSection onAddTask={handleAddTask} />
-
-              {/* Divider */}
-              <div style={{ margin: '40px 80px 0', height: 1, backgroundColor: '#e6e7ea' }} />
-
-              {/* 4. Store Floorplan */}
-              <FloorplanSection />
             </>
           )}
 
