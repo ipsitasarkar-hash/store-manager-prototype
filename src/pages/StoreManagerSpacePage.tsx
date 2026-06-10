@@ -440,8 +440,8 @@ const PriorityItem = ({ item, onAddTask }: { item: AIPriority; onAddTask: (task:
 };
 
 const CommandCenter = ({ associates, onAddTask }: { associates: Associate[]; onAddTask: (task: EmployeeTask, employeeId: string) => void }) => {
-  const criticals = AI_PRIORITIES.filter(p => p.level === 'critical');
   const ff = '"72","72full",Arial,Helvetica,sans-serif';
+  const actionableAlerts = initialAlerts.filter(a => a.status !== 'Done' && (a.severity === 'Critical' || a.severity === 'Warning'));
 
   return (
     <div style={{ padding: '32px 80px 0' }}>
@@ -480,40 +480,35 @@ const CommandCenter = ({ associates, onAddTask }: { associates: Associate[]; onA
         </div>
       </div>
 
-      {/* ── Open Alerts + Critical AI Priorities combined card ── */}
+      {/* ── Actionable Alerts ── */}
       <div style={{ borderRadius: 10, border: '1px solid #f5c2c2', backgroundColor: '#fff', overflow: 'hidden', marginBottom: 20 }}>
-        {/* Header */}
-        <div style={{ padding: '12px 16px', borderBottom: '1px solid #f0f2f4', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ padding: '10px 16px', borderBottom: '1px solid #f0f2f4', display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#d9291c', display: 'inline-block', flexShrink: 0 }} />
-          <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#d9291c', margin: 0, flex: 1 }}>Open Alerts & Critical Priorities</p>
-          <span style={{ fontFamily: ff, fontSize: 11, color: '#636d83' }}>{initialAlerts.filter(a => a.status !== 'Done').length} alerts · {criticals.length} critical</span>
+          <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#d9291c', margin: 0, flex: 1 }}>Actionable Alerts</p>
+          <span style={{ fontFamily: ff, fontSize: 11, color: '#636d83' }}>{actionableAlerts.length} require action</span>
         </div>
-
-        {/* Two-column layout: alerts left, critical priorities right */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-          {/* Alerts column */}
-          <div style={{ borderRight: '1px solid #f0f2f4' }}>
-            {initialAlerts.filter(a => a.status !== 'Done').map((a, i, arr) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: i < arr.length - 1 ? '1px solid #f0f2f4' : 'none' }}>
-                <span style={{
-                  padding: '2px 7px', borderRadius: 4, fontSize: 11, fontWeight: 700, fontFamily: ff, flexShrink: 0,
-                  backgroundColor: a.severity === 'Critical' ? 'rgba(217,41,28,0.08)' : 'rgba(231,101,0,0.08)',
-                  color: a.severity === 'Critical' ? '#d9291c' : '#e76500',
-                }}>{a.severity}</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#0b0c0f', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.product}</p>
-                  <p style={{ fontFamily: ff, fontSize: 11, color: '#636d83', margin: '1px 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.issue}</p>
-                </div>
-                <span style={{ fontFamily: ff, fontSize: 11, color: '#9fa8b4', flexShrink: 0 }}>{a.time}</span>
-              </div>
-            ))}
+        {actionableAlerts.map((a, i, arr) => (
+          <div key={a.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: i < arr.length - 1 ? '1px solid #f0f2f4' : 'none' }}>
+            <span style={{
+              padding: '2px 7px', borderRadius: 4, fontSize: 11, fontWeight: 700, fontFamily: ff, flexShrink: 0,
+              backgroundColor: a.severity === 'Critical' ? 'rgba(217,41,28,0.08)' : 'rgba(231,101,0,0.08)',
+              color: a.severity === 'Critical' ? '#d9291c' : '#e76500',
+            }}>{a.severity}</span>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#0b0c0f', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.product}</p>
+              <p style={{ fontFamily: ff, fontSize: 11, color: '#636d83', margin: '1px 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{a.issue}</p>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+              {a.assignee && <span style={{ fontFamily: ff, fontSize: 11, color: '#9fa8b4' }}>{a.assignee}</span>}
+              <span style={{
+                padding: '2px 7px', borderRadius: 4, fontSize: 11, fontWeight: 600, fontFamily: ff,
+                backgroundColor: a.status === 'In Progress' ? 'rgba(0,112,242,0.08)' : 'rgba(231,101,0,0.08)',
+                color: a.status === 'In Progress' ? '#0070f2' : '#e76500',
+              }}>{a.status}</span>
+              <span style={{ fontFamily: ff, fontSize: 11, color: '#9fa8b4' }}>{a.time}</span>
+            </div>
           </div>
-
-          {/* Critical AI priorities column */}
-          <div style={{ padding: '8px 12px', display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {criticals.map((item, i) => <PriorityItem key={i} item={item} onAddTask={onAddTask} />)}
-          </div>
-        </div>
+        ))}
       </div>
 
     </div>
