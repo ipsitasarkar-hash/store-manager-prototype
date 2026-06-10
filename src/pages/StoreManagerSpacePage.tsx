@@ -2107,41 +2107,61 @@ const FloorplanSection = () => {
           <div style={{ border: '2px solid #4a7fa5', borderRadius: 12, backgroundColor: '#f4f8fb', padding: '14px 14px 0', position: 'relative' }}>
 
             {/* Wall Shelves — top */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8, marginBottom: 10 }}>
-              {WALL_SHELVES.map(c => <Cell key={c.id} cell={c} style={{ minHeight: 48 }} />)}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 8, marginBottom: 6 }}>
+              {WALL_SHELVES.map(c => <Cell key={c.id} cell={c} style={{ minHeight: 32 }} />)}
             </div>
             {/* Wall Shelves label */}
             <div style={{ fontFamily: ff, fontSize: 9, fontWeight: 600, color: '#4a7fa5', textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'center', marginBottom: 8, opacity: 0.7 }}>Wall Shelves</div>
 
-            {/* Main floor area */}
-            <div style={{ display: 'flex', gap: 8, alignItems: 'stretch' }}>
+            {/* Main floor area: side strip + gondola rows + power wall */}
+            <div style={{ display: 'flex', gap: 6, alignItems: 'stretch' }}>
 
               {/* Impulse Purchase strip */}
-              <div style={{ width: 32, flexShrink: 0, backgroundColor: '#c5d8ec', border: '1.5px solid #4a7fa5', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontFamily: ff, fontSize: 8, fontWeight: 700, color: '#1a5276', writingMode: 'vertical-rl', transform: 'rotate(180deg)', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Impulse</span>
+              <div style={{ width: 24, flexShrink: 0, backgroundColor: '#c5d8ec', border: '1.5px solid #4a7fa5', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontFamily: ff, fontSize: 7, fontWeight: 700, color: '#1a5276', writingMode: 'vertical-rl', transform: 'rotate(180deg)', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Impulse</span>
               </div>
 
-              {/* Zone gondola columns */}
-              <div style={{ flex: 1, display: 'flex', gap: 8 }}>
-                {GONDOLA_COLS.map(col => (
-                  <div key={col.zone} style={{ flex: 1, border: '1.5px dashed #7aafd4', borderRadius: 8, padding: '6px 6px 4px', display: 'flex', flexDirection: 'column', gap: 6, backgroundColor: 'rgba(255,255,255,0.6)' }}>
-                    <div style={{ fontFamily: ff, fontSize: 8, fontWeight: 700, color: '#4a7fa5', textTransform: 'uppercase', letterSpacing: '0.4px', textAlign: 'center' }}>{col.zone}</div>
-                    <Cell cell={col.top} style={{ flex: 1, minHeight: 52 }} />
-                    <Cell cell={col.bottom} style={{ flex: 1, minHeight: 52 }} />
-                  </div>
-                ))}
+              {/* Gondola area: two shelf rows with aisle gaps between */}
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0 }}>
 
-                {/* Zone D */}
-                <div style={{ flex: 1, border: '1.5px dashed #7aafd4', borderRadius: 8, padding: '6px 6px 4px', display: 'flex', flexDirection: 'column', gap: 6, backgroundColor: 'rgba(255,255,255,0.6)' }}>
-                  <div style={{ fontFamily: ff, fontSize: 8, fontWeight: 700, color: '#4a7fa5', textTransform: 'uppercase', letterSpacing: '0.4px', textAlign: 'center' }}>Zone D</div>
-                  {ZONE_D.map(c => <Cell key={c.id} cell={c} style={{ flex: 1, minHeight: 52 }} />)}
+                {/* Zone labels row */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 6, marginBottom: 4 }}>
+                  {['Zone A', 'Zone B', 'Zone C', 'Zone D'].map(z => (
+                    <div key={z} style={{ fontFamily: ff, fontSize: 8, fontWeight: 700, color: '#4a7fa5', textTransform: 'uppercase', letterSpacing: '0.4px', textAlign: 'center' }}>{z}</div>
+                  ))}
                 </div>
+
+                {/* TOP shelf strip */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 6 }}>
+                  <Cell cell={GONDOLA_COLS[0].top} style={{ minHeight: 28, borderRadius: 4 }} />
+                  <Cell cell={GONDOLA_COLS[1].top} style={{ minHeight: 28, borderRadius: 4 }} />
+                  <Cell cell={GONDOLA_COLS[2].top} style={{ minHeight: 28, borderRadius: 4 }} />
+                  <Cell cell={ZONE_D[0]}            style={{ minHeight: 28, borderRadius: 4 }} />
+                </div>
+
+                {/* Aisle 1 walkway */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 6, margin: '3px 0' }}>
+                  {['A', 'B', 'C', 'D'].map(z => (
+                    <div key={z} style={{ height: 18, borderRadius: 3, backgroundColor: 'rgba(74,127,165,0.07)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontFamily: ff, fontSize: 7, color: '#7aafd4', letterSpacing: '0.5px', textTransform: 'uppercase' }}>aisle {z}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* BOTTOM shelf strip */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 6 }}>
+                  <Cell cell={GONDOLA_COLS[0].bottom} style={{ minHeight: 28, borderRadius: 4 }} />
+                  <Cell cell={GONDOLA_COLS[1].bottom} style={{ minHeight: 28, borderRadius: 4 }} />
+                  <Cell cell={GONDOLA_COLS[2].bottom} style={{ minHeight: 28, borderRadius: 4 }} />
+                  <Cell cell={ZONE_D[1]}               style={{ minHeight: 28, borderRadius: 4 }} />
+                </div>
+
               </div>
 
               {/* Power Wall */}
-              <div style={{ width: 52, flexShrink: 0, border: '1.5px dashed #9b8dc8', borderRadius: 8, padding: '6px 4px 4px', display: 'flex', flexDirection: 'column', gap: 6, backgroundColor: 'rgba(245,242,255,0.7)' }}>
-                <div style={{ fontFamily: ff, fontSize: 7, fontWeight: 700, color: '#5b5ea6', textTransform: 'uppercase', textAlign: 'center', letterSpacing: '0.3px' }}>Power Wall</div>
-                {POWER_WALL.map(c => <Cell key={c.id} cell={c} style={{ minHeight: 38 }} />)}
+              <div style={{ width: 44, flexShrink: 0, border: '1.5px dashed #9b8dc8', borderRadius: 8, padding: '5px 4px 4px', display: 'flex', flexDirection: 'column', gap: 4, backgroundColor: 'rgba(245,242,255,0.7)' }}>
+                <div style={{ fontFamily: ff, fontSize: 7, fontWeight: 700, color: '#5b5ea6', textTransform: 'uppercase', textAlign: 'center', letterSpacing: '0.3px', marginBottom: 2 }}>Power Wall</div>
+                {POWER_WALL.map(c => <Cell key={c.id} cell={c} style={{ minHeight: 28 }} />)}
               </div>
             </div>
 
