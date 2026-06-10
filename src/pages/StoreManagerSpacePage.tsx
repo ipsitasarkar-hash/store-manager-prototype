@@ -158,75 +158,87 @@ const TaskStatusPill = ({ status }: { status: TaskStatus }) => {
 };
 
 /* ══════════════════════════════════════════════════════
-   HEADER  (Figma-accurate PaneBar)
+   HEADER ICONS (inline SVGs matching screenshot exactly)
 ══════════════════════════════════════════════════════ */
-// Figma asset URLs from design context (node 570:11273)
-const menuIcon     = "https://www.figma.com/api/mcp/asset/06453a53-ba16-442e-9a4a-04a20d8588fe"; // toggle/hamburger
-const overviewIcon = "https://www.figma.com/api/mcp/asset/2fd7e8a9-7fca-42a3-b057-0cc979141858"; // legend/overview
-const dotsIcon     = "https://www.figma.com/api/mcp/asset/34bdf51f-c9a7-42fe-ab18-c59209359770"; // overflow dots
-const chatPaneIcon = "https://www.figma.com/api/mcp/asset/512aa8bf-8424-4113-8dac-177c8e75727c"; // chat pane toggle
+const TaskListIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="3" cy="4" r="1.5" fill="#0b0c0f" />
+    <circle cx="3" cy="9" r="1.5" fill="#0b0c0f" />
+    <circle cx="3" cy="14" r="1.5" fill="#0b0c0f" />
+    <rect x="7" y="3" width="9" height="2" rx="1" fill="#0b0c0f" />
+    <rect x="7" y="8" width="9" height="2" rx="1" fill="#0b0c0f" />
+    <rect x="7" y="13" width="9" height="2" rx="1" fill="#0b0c0f" />
+  </svg>
+);
+
+const OverviewIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="1" y="2" width="3" height="3" rx="0.5" fill="#0b0c0f" />
+    <rect x="6" y="3" width="11" height="1.5" rx="0.75" fill="#0b0c0f" />
+    <rect x="1" y="7.5" width="3" height="3" rx="0.5" fill="#0b0c0f" />
+    <rect x="6" y="8.5" width="11" height="1.5" rx="0.75" fill="#0b0c0f" />
+    <rect x="1" y="13" width="3" height="3" rx="0.5" fill="#0b0c0f" />
+    <rect x="6" y="14" width="11" height="1.5" rx="0.75" fill="#0b0c0f" />
+  </svg>
+);
+
+const DotsIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="3.5" cy="9" r="1.5" fill="#0b0c0f" />
+    <circle cx="9" cy="9" r="1.5" fill="#0b0c0f" />
+    <circle cx="14.5" cy="9" r="1.5" fill="#0b0c0f" />
+  </svg>
+);
+
+const ChatPaneIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M15 2H3C2.44772 2 2 2.44772 2 3V12C2 12.5523 2.44772 13 3 13H6L9 16L12 13H15C15.5523 13 16 12.5523 16 12V3C16 2.44772 15.5523 2 15 2Z" stroke="#0057d2" strokeWidth="1.5" strokeLinejoin="round" />
+    <line x1="5" y1="6.5" x2="13" y2="6.5" stroke="#0057d2" strokeWidth="1.5" strokeLinecap="round" />
+    <line x1="5" y1="9.5" x2="10" y2="9.5" stroke="#0057d2" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
 
 const SpaceHeader = () => (
-  <>
-    {/* PaneBar — matches Figma px-[24px] py-[20px] */}
-    <div
-      className="flex items-center justify-between shrink-0 relative z-10"
-      style={{ padding: '20px 24px' }}
-    >
-      {/* Left: hamburger + title */}
-      <div className="flex items-center" style={{ gap: 24 }}>
-        <div className="flex items-center" style={{ gap: 8 }}>
-          <button
-            className="flex items-center justify-center rounded-lg hover:bg-[#f0f2f4] transition-colors"
-            style={{ padding: 10.855, borderRadius: 8 }}
-          >
-            <img src={menuIcon} alt="Menu" style={{ width: 18, height: 18 }} className="object-contain" />
-          </button>
-        </div>
+  /* PaneBar — matches Figma px-[24px] py-[20px] */
+  <div
+    className="flex items-center justify-between shrink-0 relative z-10"
+    style={{ padding: '20px 24px' }}
+  >
+    {/* Left: task-list icon (matching screenshot) */}
+    <div className="flex items-center" style={{ gap: 8 }}>
+      <button
+        className="flex items-center justify-center rounded-lg hover:bg-[#f0f2f4] transition-colors"
+        style={{ padding: 10.855, borderRadius: 8 }}
+      >
+        <TaskListIcon />
+      </button>
+    </div>
+
+    {/* Right: Overview btn + dots + chat toggle */}
+    <div className="flex items-center" style={{ gap: 8 }}>
+      <button
+        className="flex items-center gap-2 hover:bg-[#f0f2f4] transition-colors rounded-lg"
+        style={{ paddingLeft: 16, paddingRight: 16, paddingTop: 9, paddingBottom: 9, borderRadius: 8 }}
+      >
+        <OverviewIcon />
         <span style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 16, fontWeight: 600, lineHeight: '22px', color: '#0b0c0f' }}>
-          Store Manager Dashboard
+          Overview
         </span>
-      </div>
-
-      {/* Right: Overview btn + dots + chat toggle */}
-      <div className="flex items-center" style={{ gap: 8 }}>
-        <button
-          className="flex items-center gap-2 hover:bg-[#f0f2f4] transition-colors rounded-lg"
-          style={{ paddingLeft: 16, paddingRight: 16, paddingTop: 9, paddingBottom: 9, borderRadius: 8 }}
-        >
-          <img src={overviewIcon} alt="Overview" style={{ width: 18, height: 18 }} className="object-contain" />
-          <span style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 16, fontWeight: 600, lineHeight: '22px', color: '#0b0c0f' }}>
-            Overview
-          </span>
-        </button>
-        <button
-          className="flex items-center justify-center hover:bg-[#f0f2f4] transition-colors rounded-lg"
-          style={{ padding: 10.855, borderRadius: 8 }}
-        >
-          <img src={dotsIcon} alt="More" style={{ width: 18, height: 18 }} className="object-contain" />
-        </button>
-        <button
-          className="flex items-center justify-center rounded-lg transition-colors"
-          style={{ padding: 10.855, borderRadius: 8, backgroundColor: '#e5ecf5' }}
-        >
-          <img src={chatPaneIcon} alt="Chat" style={{ width: 18, height: 18 }} className="object-contain" />
-        </button>
-      </div>
+      </button>
+      <button
+        className="flex items-center justify-center hover:bg-[#f0f2f4] transition-colors rounded-lg"
+        style={{ padding: 10.855, borderRadius: 8 }}
+      >
+        <DotsIcon />
+      </button>
+      <button
+        className="flex items-center justify-center rounded-lg transition-colors"
+        style={{ padding: 10.855, borderRadius: 8, backgroundColor: '#e5ecf5' }}
+      >
+        <ChatPaneIcon />
+      </button>
     </div>
-
-    {/* Breadcrumb + Title below pane bar */}
-    <div className="relative shrink-0 z-10" style={{ paddingLeft: 24, paddingRight: 24, paddingTop: 8, paddingBottom: 8 }}>
-      <div className="flex items-center gap-2 mb-2">
-        <img src={spaceIcon} alt="Space" className="w-4 h-4 object-contain opacity-60" />
-        <span style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 12, fontWeight: 400, color: '#636d83' }}>Spaces</span>
-        <ChevronRight size={12} style={{ color: '#636d83' }} />
-        <span style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 12, fontWeight: 400, color: '#636d83' }}>Store Operations</span>
-      </div>
-      <h1 style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 26, fontWeight: 300, lineHeight: '32px', color: '#0b0c0f', margin: 0, marginTop: 8 }}>
-        Store Manager Dashboard — Produce Dept
-      </h1>
-    </div>
-  </>
+  </div>
 );
 
 /* ══════════════════════════════════════════════════════
@@ -246,7 +258,234 @@ const InsightsPanel = ({ onClose }: { onClose: () => void }) => (
 );
 
 /* ══════════════════════════════════════════════════════
-   KPI SUMMARY  (same pattern as SummaryStats)
+   COMMAND CENTER — top 35% of dashboard
+   1. Store Health KPIs
+   2. Forecast + Operational Risks
+   3. AI Priorities (Critical / Important / Opportunity)
+   4. Employee Snapshot
+══════════════════════════════════════════════════════ */
+
+interface AIPriority {
+  level: 'critical' | 'important' | 'opportunity';
+  what: string;
+  why: string;
+  action: string;
+}
+
+const AI_PRIORITIES: AIPriority[] = [
+  {
+    level: 'critical',
+    what: 'Bottled Water will stock out by 3 PM',
+    why: 'Velocity up 40% — heat forecast driving demand. Back stock cleared this morning.',
+    action: 'Submit emergency reorder now and pull remaining units to floor.',
+  },
+  {
+    level: 'critical',
+    what: 'Cashier shortage expected 5–7 PM',
+    why: 'Two call-outs confirmed. Fri evening peak historically +60% vs mid-day.',
+    action: 'Reassign Alex T. from Zone C or approve overtime for Sam K.',
+  },
+  {
+    level: 'important',
+    what: 'Electronics conversion rate down 12%',
+    why: 'Competitor ran a flash sale this morning — foot traffic up but basket size down.',
+    action: 'Enable in-store price-match offer and flag for category manager.',
+  },
+  {
+    level: 'important',
+    what: 'Refunds unusually high in Aisle 8',
+    why: '7 refunds in 90 min — all same batch of Greek Yogurt (best-before today).',
+    action: 'Pull full batch, log shrink, and swap signage to alternative SKU.',
+  },
+  {
+    level: 'opportunity',
+    what: 'Add impulse display near checkout',
+    why: 'Checkout dwell time up 3 min due to longer queues — high capture potential.',
+    action: 'Move chilled drink cooler from Aisle 2 end-cap to checkout lane 4.',
+  },
+  {
+    level: 'opportunity',
+    what: 'Promote sunscreen — high demand forecast',
+    why: 'UV index hitting 9 this weekend. Last year same conditions → +$800 sunscreen sales.',
+    action: 'Build featured display at store entrance; push offer to loyalty app.',
+  },
+];
+
+const PRIORITY_CONFIG = {
+  critical:    { bg: '#fff0f0', border: '#d9291c', dot: '#d9291c', label: 'Critical',    labelBg: 'rgba(217,41,28,0.1)',  labelColor: '#d9291c',  emoji: '🔴' },
+  important:   { bg: '#fff8f0', border: '#e76500', dot: '#e76500', label: 'Important',   labelBg: 'rgba(231,101,0,0.1)',  labelColor: '#e76500',  emoji: '🟠' },
+  opportunity: { bg: '#f0fff5', border: '#198450', dot: '#198450', label: 'Opportunity', labelBg: 'rgba(25,132,80,0.1)', labelColor: '#198450',  emoji: '🟢' },
+};
+
+const PriorityItem = ({ item, onAddTask }: { item: AIPriority; onAddTask: (task: EmployeeTask, employeeId: string) => void }) => {
+  const [open, setOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [added, setAdded] = useState(false);
+  const cfg = PRIORITY_CONFIG[item.level];
+  const ff = '"72","72full",Arial,Helvetica,sans-serif';
+
+  const handleAddedFromModal = (task: EmployeeTask, employeeId: string) => {
+    onAddTask(task, employeeId);
+    setAdded(true);
+    setShowModal(false);
+  };
+
+  return (
+    <>
+      <div
+        style={{ borderRadius: 8, border: `1.5px solid ${open ? cfg.border : '#e6e7ea'}`, backgroundColor: open ? cfg.bg : '#fff', transition: 'all 0.15s', cursor: 'pointer' }}
+        onClick={() => setOpen(o => !o)}
+      >
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '11px 14px' }}>
+          <span style={{ fontSize: 14, lineHeight: '20px', flexShrink: 0, marginTop: 1 }}>{cfg.emoji}</span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 600, color: '#0b0c0f', margin: 0, lineHeight: '18px', flex: 1 }}>{item.what}</p>
+              {added && (
+                <span style={{ fontFamily: ff, fontSize: 11, fontWeight: 600, color: '#198450', backgroundColor: 'rgba(25,132,80,0.08)', padding: '2px 8px', borderRadius: 10, whiteSpace: 'nowrap', flexShrink: 0 }}>
+                  ✓ Added
+                </span>
+              )}
+            </div>
+            {open && (
+              <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <span style={{ fontFamily: ff, fontSize: 11, fontWeight: 700, color: '#636d83', flexShrink: 0, marginTop: 1 }}>WHY</span>
+                  <p style={{ fontFamily: ff, fontSize: 12, fontWeight: 400, color: '#353c4a', margin: 0, lineHeight: '18px' }}>{item.why}</p>
+                </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <span style={{ fontFamily: ff, fontSize: 11, fontWeight: 700, color: cfg.labelColor, flexShrink: 0, marginTop: 1 }}>DO</span>
+                  <p style={{ fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#0b0c0f', margin: 0, lineHeight: '18px' }}>{item.action}</p>
+                </div>
+                {/* Add to Task Board button */}
+                <div style={{ marginTop: 6 }}>
+                  <button
+                    onClick={e => { e.stopPropagation(); setShowModal(true); }}
+                    style={{
+                      padding: '6px 12px', borderRadius: 6, border: 'none',
+                      backgroundColor: added ? 'rgba(25,132,80,0.1)' : '#0070f2',
+                      color: added ? '#198450' : '#fff',
+                      fontFamily: ff, fontSize: 12, fontWeight: 600,
+                      cursor: added ? 'default' : 'pointer',
+                      display: 'inline-flex', alignItems: 'center', gap: 5,
+                      transition: 'background 0.15s',
+                    }}
+                    disabled={added}
+                  >
+                    {added ? <><CheckCircle2 size={12} /> Added to Task Board</> : <><Plus size={12} /> Add to Task Board</>}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+          <ChevronDown size={14} style={{ color: '#636d83', flexShrink: 0, marginTop: 3, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
+        </div>
+      </div>
+
+      {showModal && (
+        <AddTaskModal
+          employees={initialTaskBoard}
+          prefillTitle={item.what}
+          prefillNote={item.action}
+          onClose={() => setShowModal(false)}
+          onAdd={handleAddedFromModal}
+        />
+      )}
+    </>
+  );
+};
+
+const CommandCenter = ({ associates, onAddTask }: { associates: Associate[]; onAddTask: (task: EmployeeTask, employeeId: string) => void }) => {
+  const criticals    = AI_PRIORITIES.filter(p => p.level === 'critical');
+  const importants   = AI_PRIORITIES.filter(p => p.level === 'important');
+  const opportunities = AI_PRIORITIES.filter(p => p.level === 'opportunity');
+
+  const ff = '"72","72full",Arial,Helvetica,sans-serif';
+
+  return (
+    <div style={{ padding: '32px 80px 0' }}>
+
+      {/* ── Row 1: Store Health KPIs ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, marginBottom: 20 }}>
+        {[
+          { label: 'Store Health',    value: '74%',    sub: '↓ vs yesterday',  valueColor: '#e76500', subColor: '#e76500' },
+          { label: 'Open Alerts',     value: '5',      sub: '3 critical',      valueColor: '#d9291c', subColor: '#d9291c' },
+          { label: 'Tasks Complete',  value: '4 / 12', sub: '33% shift done',  valueColor: '#0b0c0f', subColor: '#636d83' },
+        ].map((kpi, i) => (
+          <div key={i} style={{ borderRadius: 8, border: '1px solid #e6e7ea', backgroundColor: '#fff', padding: '14px 16px' }}>
+            <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: '#636d83', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{kpi.label}</p>
+            <p style={{ fontFamily: ff, fontSize: 22, fontWeight: 700, color: kpi.valueColor, margin: '0 0 3px', lineHeight: 1 }}>{kpi.value}</p>
+            <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: kpi.subColor, margin: 0 }}>{kpi.sub}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Row 2: Forecast + AI Priorities ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 16, marginBottom: 20 }}>
+
+        {/* Operational Risks — Figma card style */}
+        <div style={{ borderRadius: 16, backgroundColor: '#fefdff', border: '1px solid #e6e7ea', overflow: 'hidden' }}>
+          {/* Card header */}
+          <div style={{ padding: '16px 24px 8px' }}>
+            <p style={{ fontFamily: ff, fontSize: 16, fontWeight: 600, color: '#0f1115', margin: 0, lineHeight: '24px' }}>Operational Risks</p>
+          </div>
+          {/* Card items */}
+          <div style={{ padding: '6px 16px 16px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {[
+              { emoji: '⛅', label: 'Foot Traffic',  value: '+18% by noon',    note: 'Fri lunch peak + school out',        bg: '#d1efff', color: '#0070f2' },
+              { emoji: '📦', label: 'Stock Risk',    value: '4 items < 2 hrs', note: 'Strawberry, Avocado, Spinach, Water', bg: '#ffe0e0', color: '#d9291c' },
+              { emoji: '👥', label: 'Staffing',      value: '−2 associates',   note: 'Call-outs 5–7 PM window',            bg: '#fff0e0', color: '#e76500' },
+              { emoji: '🕐', label: 'Next Delivery', value: '11:30 AM',        note: '3 items still unverified',           bg: '#f0f2f4', color: '#636d83' },
+              { emoji: '💰', label: 'Margin at Risk',value: '~$68',            note: 'Tomato + Avocado expiry',            bg: '#fff0e0', color: '#e76500' },
+            ].map((row, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0' }}>
+                {/* Thumbnail */}
+                <div style={{ width: 30, height: 30, borderRadius: 20, backgroundColor: row.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 14 }}>
+                  {row.emoji}
+                </div>
+                {/* Text */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontFamily: ff, fontSize: 14, fontWeight: 600, color: '#0f1115', margin: 0, lineHeight: '20px' }}>
+                    {row.label} <span style={{ fontWeight: 700, color: row.color }}>{row.value}</span>
+                  </p>
+                  <p style={{ fontFamily: ff, fontSize: 14, fontWeight: 400, color: '#636d83', margin: 0, lineHeight: '20px', letterSpacing: '0.25px' }}>{row.note}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* AI Priorities */}
+        <div style={{ borderRadius: 8, border: '1.5px solid rgba(93,54,255,0.2)', backgroundColor: '#fdfcff', padding: '16px 18px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+            <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'linear-gradient(135deg,#BA79EF,#470CED)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Zap size={11} className="text-white" />
+            </div>
+            <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#0b0c0f', margin: 0 }}>AI Priorities</p>
+            <span style={{ marginLeft: 'auto', fontFamily: ff, fontSize: 11, color: '#636d83' }}>Click to expand</span>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {/* Critical group */}
+            <p style={{ fontFamily: ff, fontSize: 10, fontWeight: 700, color: '#d9291c', textTransform: 'uppercase', letterSpacing: '0.6px', margin: '4px 0 4px' }}>🔴 Critical</p>
+            {criticals.map((item, i) => <PriorityItem key={i} item={item} onAddTask={onAddTask} />)}
+
+            <p style={{ fontFamily: ff, fontSize: 10, fontWeight: 700, color: '#e76500', textTransform: 'uppercase', letterSpacing: '0.6px', margin: '8px 0 4px' }}>🟠 Important</p>
+            {importants.map((item, i) => <PriorityItem key={i} item={item} onAddTask={onAddTask} />)}
+
+            <p style={{ fontFamily: ff, fontSize: 10, fontWeight: 700, color: '#198450', textTransform: 'uppercase', letterSpacing: '0.6px', margin: '8px 0 4px' }}>🟢 Opportunity</p>
+            {opportunities.map((item, i) => <PriorityItem key={i} item={item} onAddTask={onAddTask} />)}
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  );
+};
+
+/* ══════════════════════════════════════════════════════
+   KPI SUMMARY  (kept for chat panel reference, no longer rendered in main scroll)
 ══════════════════════════════════════════════════════ */
 const SummaryStats = ({ alerts }: { alerts: StoreAlert[] }) => {
   const critical  = alerts.filter(a => a.severity === "Critical").length;
@@ -441,27 +680,128 @@ type ChatMessage = {
   role: "user" | "bot";
   text: string;
   time: string;
-  widget?: "task-summary" | "assign-confirm" | "reorder-confirm";
-  widgetData?: Record<string, string>;
+  widget?: "reassign-plan" | "reassign-confirm" | "reassign-done" | "reorder-confirm";
 };
+
+/* ── Reassignment plan widget ── */
+interface ReassignRow { task: string; from: string; to: string; zone: string; priority: "High" | "Medium"; }
+
+const REASSIGN_PLAN: ReassignRow[] = [
+  { task: "Submit reorder for Baby Spinach",       from: "Alex T.", to: "Jordan M.", zone: "Zone C → Action remote", priority: "High"   },
+  { task: "Apply markdown — Heirloom Tomatoes",    from: "Alex T.", to: "Sam K.",    zone: "Zone C · Shelf 4A",      priority: "Medium" },
+  { task: "Cull damaged blackberries",             from: "Alex T.", to: "Sam K.",    zone: "Zone C",                  priority: "Medium" },
+];
+
+const ff = '"72","72full",Arial,Helvetica,sans-serif';
+
+const ReassignPlanWidget = ({ onConfirm, onEdit }: { onConfirm: () => void; onEdit: () => void }) => (
+  <div style={{ marginTop: 10, borderRadius: 10, border: '1.5px solid #e6e7ea', backgroundColor: '#fff', overflow: 'hidden' }}>
+    {/* Header */}
+    <div style={{ backgroundColor: '#fff8f0', borderBottom: '1px solid #f5e0cc', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 8 }}>
+      <AlertTriangle size={14} style={{ color: '#e76500', flexShrink: 0 }} />
+      <span style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#e76500' }}>Alex T. — Unplanned Absence</span>
+      <span style={{ marginLeft: 'auto', fontFamily: ff, fontSize: 11, color: '#636d83' }}>3 tasks to reassign</span>
+    </div>
+
+    {/* Task rows */}
+    <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {REASSIGN_PLAN.map((row, i) => (
+        <div key={i} style={{ borderRadius: 7, border: '1px solid #e6e7ea', padding: '9px 12px', backgroundColor: '#fafafa' }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#0b0c0f', margin: 0 }}>{row.task}</p>
+              <p style={{ fontFamily: ff, fontSize: 11, color: '#636d83', margin: '2px 0 0' }}>{row.zone}</p>
+            </div>
+            <span style={{
+              flexShrink: 0, padding: '2px 7px', borderRadius: 99,
+              backgroundColor: row.priority === 'High' ? 'rgba(217,41,28,0.08)' : 'rgba(231,101,0,0.08)',
+              fontFamily: ff, fontSize: 10, fontWeight: 700,
+              color: row.priority === 'High' ? '#d9291c' : '#e76500',
+            }}>{row.priority}</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8 }}>
+            <span style={{ fontFamily: ff, fontSize: 11, color: '#636d83', textDecoration: 'line-through' }}>{row.from}</span>
+            <ChevronRight size={11} style={{ color: '#636d83', flexShrink: 0 }} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <div style={{ width: 18, height: 18, borderRadius: '50%', background: 'linear-gradient(135deg,#8A48E6,#470CED)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <span style={{ fontFamily: ff, fontSize: 9, fontWeight: 700, color: '#fff' }}>{row.to.split(' ').map(w => w[0]).join('')}</span>
+              </div>
+              <span style={{ fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#0b0c0f' }}>{row.to}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    {/* Joule rationale */}
+    <div style={{ margin: '0 14px 12px', borderRadius: 7, backgroundColor: '#f6f3ff', border: '1px solid rgba(93,54,255,0.15)', padding: '9px 12px' }}>
+      <p style={{ fontFamily: ff, fontSize: 12, color: '#353c4a', margin: 0, lineHeight: '18px' }}>
+        <strong style={{ color: '#552cff' }}>Why this plan:</strong> Spinach reorder is time-sensitive — Jordan is closest and has capacity. Tomato markdown + blackberry cull are batched to Sam since he's finishing delivery verification nearby.
+      </p>
+    </div>
+
+    {/* Actions */}
+    <div style={{ padding: '0 14px 14px', display: 'flex', gap: 8 }}>
+      <button
+        onClick={onConfirm}
+        style={{ flex: 1, padding: '9px 0', borderRadius: 7, border: 'none', backgroundColor: '#5d36ff', color: '#fff', fontFamily: ff, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+      >
+        Confirm Reassignment
+      </button>
+      <button
+        onClick={onEdit}
+        style={{ padding: '9px 16px', borderRadius: 7, border: '1px solid #e6e7ea', backgroundColor: '#fff', color: '#0b0c0f', fontFamily: ff, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+      >
+        Edit Plan
+      </button>
+    </div>
+  </div>
+);
+
+const ReassignDoneWidget = () => (
+  <div style={{ marginTop: 10, borderRadius: 10, border: '1.5px solid #c8e6c9', backgroundColor: '#f6fff8', padding: '12px 14px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+      <CheckCircle2 size={15} style={{ color: '#198450', flexShrink: 0 }} />
+      <span style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#198450' }}>All 3 tasks reassigned</span>
+    </div>
+    {REASSIGN_PLAN.map((row, i) => (
+      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
+        <CheckCircle2 size={11} style={{ color: '#198450', flexShrink: 0 }} />
+        <span style={{ fontFamily: ff, fontSize: 12, color: '#0b0c0f' }}><strong>{row.to}</strong> — {row.task}</span>
+      </div>
+    ))}
+    <div style={{ marginTop: 10, padding: '8px 10px', borderRadius: 6, backgroundColor: '#fff', border: '1px solid #e6e7ea' }}>
+      <p style={{ fontFamily: ff, fontSize: 12, color: '#636d83', margin: 0 }}>
+        📲 Jordan M. and Sam K. have been notified via the associate app. Zone C coverage updated.
+      </p>
+    </div>
+  </div>
+);
+
+type ConvState = "idle" | "awaiting-confirm" | "done";
 
 const botReplies: Record<string, string> = {
   default: "I'm monitoring the full shift in real time. Ask me to reassign tasks, check any item's stock level, draft a reorder, or summarise the shift for handoff.",
   reorder: "I've drafted a reorder request for Baby Spinach 5oz (SKU-2203). Qty: 3 cases (36 units). Estimated delivery: tomorrow 8 AM. Want me to submit it?",
-  assign:  "I can reassign Alex T. from Zone C to help Jordan in Zone A with the Strawberry and Banana pull. Sam K. covers the delivery verification solo. Confirm?",
   handoff: "Here's your shift summary:\n\n• 4 tasks completed, 8 open\n• 3 critical alerts (Strawberry, Avocado, Spinach)\n• $14.80 shrink logged\n• Afternoon delivery at 11:30 AM — 3 items still unverified\n• Cooler in 4B flagged — facilities notified\n\nShall I send this to the afternoon manager?",
   markdown: "I'll apply a 15% markdown to Heirloom Tomatoes (pint) and Hass Avocado to drive velocity before expiry. Estimated revenue recovery: ~$68. Confirm?",
   status:  "Current status:\n• Jordan M. (Zone A): On floor, 3 tasks open\n• Sam K. (Zone B): Back room, 3 tasks open\n• Alex T. (Zone C): On floor, 2 tasks open — 0 completions so far this shift.",
 };
 
-function getBotReply(text: string): string {
+function getBotReply(text: string): { text: string; widget?: ChatMessage["widget"] } {
   const t = text.toLowerCase();
-  if (t.includes("reorder") || t.includes("spinach") || t.includes("order")) return botReplies.reorder;
-  if (t.includes("assign") || t.includes("reassign") || t.includes("alex") || t.includes("jordan")) return botReplies.assign;
-  if (t.includes("handoff") || t.includes("summary") || t.includes("end of shift")) return botReplies.handoff;
-  if (t.includes("markdown") || t.includes("expir") || t.includes("tomato") || t.includes("avocado")) return botReplies.markdown;
-  if (t.includes("status") || t.includes("team") || t.includes("associate")) return botReplies.status;
-  return botReplies.default;
+  if (t.includes("reorder") || t.includes("spinach") || t.includes("order")) return { text: botReplies.reorder };
+  if (t.includes("handoff") || t.includes("summary") || t.includes("end of shift")) return { text: botReplies.handoff };
+  if (t.includes("markdown") || t.includes("expir") || t.includes("tomato")) return { text: botReplies.markdown };
+  if (t.includes("status") || t.includes("team")) return { text: botReplies.status };
+  // Alex callout flow
+  if (t.includes("alex") && (t.includes("off") || t.includes("left") || t.includes("sick") || t.includes("absent") || t.includes("called") || t.includes("take off") || t.includes("took off") || t.includes("reassign"))) {
+    return {
+      text: "Got it — Alex T. has left the shift unexpectedly. He had **3 open tasks** in Zone C. I've analysed current workloads for Jordan and Sam and put together a reassignment plan.",
+      widget: "reassign-plan",
+    };
+  }
+  return { text: botReplies.default };
 }
 
 const JouleAvatar = () => (
@@ -510,11 +850,15 @@ const MessageActions = () => (
 const SpaceChatPanel = ({
   alerts,
   onAssign,
+  onReassignConfirmed,
+  triggerAlexSignoff,
 }: {
   alerts: StoreAlert[];
   onAssign: (id: string, name: string) => void;
+  onReassignConfirmed: () => void;
+  triggerAlexSignoff: boolean;
 }) => {
-  const now = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const nowStr = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -525,33 +869,75 @@ const SpaceChatPanel = ({
   ]);
   const [input, setInput] = useState("");
   const [thinking, setThinking] = useState(false);
+  const [convState, setConvState] = useState<ConvState>("idle");
   const bottomRef = useRef<HTMLDivElement>(null);
+  const alexTriggered = useRef(false);
+
+  // Auto-trigger Joule message when Alex signs off
+  useEffect(() => {
+    if (!triggerAlexSignoff || alexTriggered.current) return;
+    alexTriggered.current = true;
+    setThinking(true);
+    setTimeout(() => {
+      setThinking(false);
+      setConvState("awaiting-confirm");
+      addBotMessage(
+        "🚨 **Alert:** Alex T. has just signed off — he had **3 open tasks** in Zone C.\n\nI've analysed current workloads for Jordan and Sam and put together a reassignment plan.",
+        "reassign-plan"
+      );
+    }, 1800);
+  }, [triggerAlexSignoff]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, thinking]);
 
-  const send = () => {
-    const text = input.trim();
+  const addBotMessage = (text: string, widget?: ChatMessage["widget"]) => {
+    setMessages(m => [...m, { role: "bot", text, time: nowStr(), widget }]);
+  };
+
+  const send = (overrideText?: string) => {
+    const text = (overrideText ?? input).trim();
     if (!text) return;
-    const userMsg: ChatMessage = { role: "user", text, time: now() };
+    const userMsg: ChatMessage = { role: "user", text, time: nowStr() };
     setMessages(m => [...m, userMsg]);
     setInput("");
     setThinking(true);
     setTimeout(() => {
       setThinking(false);
-      setMessages(m => [...m, { role: "bot", text: getBotReply(text), time: now() }]);
+      const reply = getBotReply(text);
+      if (reply.widget === "reassign-plan") setConvState("awaiting-confirm");
+      addBotMessage(reply.text, reply.widget);
     }, 1200);
   };
 
-  const quickActions = ["Reorder Baby Spinach", "Reassign Alex to Zone A", "Apply markdowns", "Team status", "Prepare handoff"];
+  const handleConfirmReassign = () => {
+    setConvState("done");
+    setMessages(m => m.map(msg =>
+      msg.widget === "reassign-plan" ? { ...msg, widget: "reassign-done" as const } : msg
+    ));
+    onReassignConfirmed();
+    setTimeout(() => {
+      addBotMessage("Done. Jordan and Sam have been notified. I've also flagged Zone C as understaffed for the rest of the shift — want me to check if any part-timers are available to cover?");
+    }, 600);
+  };
+
+  const handleEditPlan = () => {
+    addBotMessage("Sure — which task would you like to reassign differently? You can tell me e.g. \"Give the spinach reorder to Sam instead\".");
+  };
+
+  const quickActions = convState === "idle"
+    ? ["Alex had to take off — reassign tasks", "Reorder Baby Spinach", "Apply markdowns", "Team status", "Prepare handoff"]
+    : convState === "awaiting-confirm"
+    ? ["Confirm the plan", "Give spinach reorder to Sam", "What's Jordan's current load?"]
+    : ["Check part-timer availability", "Prepare handoff", "Team status"];
 
   return (
     <div
       className="flex flex-col h-full"
       style={{ backgroundColor: '#f8f9fa', borderLeft: '1px solid #e6e7ea' }}
     >
-      {/* Right Pane Header — Figma PaneBar section="Right Pane" */}
+      {/* Right Pane Header */}
       <div
         className="flex items-center justify-between shrink-0"
         style={{ padding: '20px 24px', gap: 16 }}
@@ -559,7 +945,7 @@ const SpaceChatPanel = ({
         <div className="flex items-center min-w-0 flex-1" style={{ gap: 16 }}>
           <div className="flex items-center gap-2 min-w-0">
             <img src={spaceIcon} alt="" className="w-4 h-4 object-contain opacity-60 shrink-0" />
-            <span style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 16, fontWeight: 600, lineHeight: '22px', color: '#0b0c0f', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            <span style={{ fontFamily: ff, fontSize: 16, fontWeight: 600, lineHeight: '22px', color: '#0b0c0f', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               Store Manager Chat
             </span>
           </div>
@@ -579,35 +965,42 @@ const SpaceChatPanel = ({
           style={{ borderRadius: 6, backgroundColor: 'rgba(93,54,255,0.05)', border: '1px solid rgba(93,54,255,0.15)' }}
         >
           <img src={spaceIcon} alt="" className="w-3.5 h-3.5 object-contain opacity-70" />
-          <span style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 12, fontWeight: 600, color: '#552cff' }}>Space created · Today 10:42 AM</span>
+          <span style={{ fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#552cff' }}>Space created · Today 10:42 AM</span>
         </div>
       </div>
 
-      {/* Messages — Figma font: 72 Regular 14px/20px */}
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto min-h-0" style={{ padding: '0 16px 16px' }}>
         <div className="space-y-6">
           {messages.map((msg, i) => (
             <div key={i} className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
               {msg.role === "bot" && <JouleAvatar />}
-              <div className="max-w-[85%] group">
+              <div className={`group ${msg.role === "user" ? "max-w-[85%]" : "w-full"}`}>
                 {msg.role === "user" ? (
                   <div
                     className="px-3 py-2"
-                    style={{ backgroundColor: '#f0f2f4', borderRadius: 10, borderTopRightRadius: 3, color: '#0b0c0f', fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 14, fontWeight: 400, lineHeight: '20px' }}
+                    style={{ backgroundColor: '#f0f2f4', borderRadius: 10, borderTopRightRadius: 3, color: '#0b0c0f', fontFamily: ff, fontSize: 14, fontWeight: 400, lineHeight: '20px' }}
                   >
                     {msg.text}
                   </div>
                 ) : (
                   <div>
-                    <div style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 14, fontWeight: 400, lineHeight: '20px', color: '#0b0c0f', whiteSpace: 'pre-line' }}>
+                    <div style={{ fontFamily: ff, fontSize: 14, fontWeight: 400, lineHeight: '20px', color: '#0b0c0f', whiteSpace: 'pre-line' }}>
                       {msg.text.split("**").map((part, j) =>
                         j % 2 === 1 ? <strong key={j}>{part}</strong> : part
                       )}
                     </div>
+                    {/* Widgets */}
+                    {msg.widget === "reassign-plan" && (
+                      <ReassignPlanWidget onConfirm={handleConfirmReassign} onEdit={handleEditPlan} />
+                    )}
+                    {msg.widget === "reassign-done" && (
+                      <ReassignDoneWidget />
+                    )}
                     <MessageActions />
                   </div>
                 )}
-                <p style={{ fontSize: 12, color: '#636d83', marginTop: 4, textAlign: msg.role === "user" ? 'right' : 'left', fontFamily: '"72","72full",Arial,Helvetica,sans-serif' }}>{msg.time}</p>
+                <p style={{ fontSize: 12, color: '#636d83', marginTop: 4, textAlign: msg.role === "user" ? 'right' : 'left', fontFamily: ff }}>{msg.time}</p>
               </div>
             </div>
           ))}
@@ -627,7 +1020,7 @@ const SpaceChatPanel = ({
         </div>
       </div>
 
-      {/* Gradient backdrop + Joule Input — matches Figma exactly */}
+      {/* Gradient backdrop + Joule Input */}
       <div className="shrink-0 relative">
         {/* Gradient fade */}
         <div
@@ -816,79 +1209,23 @@ const initialTaskBoard: EmployeeColumn[] = [
 /* ══════════════════════════════════════════════════════
    PERSONALIZATION / MY DAY SECTION
 ══════════════════════════════════════════════════════ */
-const dayMetrics = [
-  { label: "Shift Start", value: "8:00 AM" },
-  { label: "Dept", value: "Produce" },
-  { label: "Team on Floor", value: "3 Associates" },
-  { label: "Shrink Today", value: "$14.80" },
-  { label: "Shift Progress", value: "33%" },
-];
-
-const MyDaySection = () => (
-  <div style={{ padding: '40px 80px 0' }}>
+const MyDaySection = ({ associates, onAddTask }: { associates: Associate[]; onAddTask: (task: EmployeeTask, employeeId: string) => void }) => (
+  <div>
     {/* Greeting */}
-    <h1 style={{
-      fontFamily: '"72","72full",Arial,Helvetica,sans-serif',
-      fontSize: 40,
-      fontWeight: 400,
-      lineHeight: '48px',
-      color: '#0b0c0f',
-      margin: 0,
-      marginBottom: 32,
-    }}>
-      Good morning, Sarah.
-    </h1>
-
-    {/* KV metrics row — Figma: label 14px tertiary, value 20px primary */}
-    <div className="flex items-start flex-wrap" style={{ gap: '0 40px', marginBottom: 28 }}>
-      {dayMetrics.map((m, i) => (
-        <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <span style={{
-            fontFamily: '"72","72full",Arial,Helvetica,sans-serif',
-            fontSize: 14,
-            fontWeight: 400,
-            lineHeight: '20px',
-            color: '#636d83',
-          }}>{m.label}</span>
-          <span style={{
-            fontFamily: '"72","72full",Arial,Helvetica,sans-serif',
-            fontSize: 20,
-            fontWeight: 600,
-            lineHeight: '28px',
-            color: '#0b0c0f',
-          }}>{m.value}</span>
-        </div>
-      ))}
+    <div style={{ padding: '32px 80px 0' }}>
+      <h1 style={{
+        fontFamily: '"72","72full",Arial,Helvetica,sans-serif',
+        fontSize: 32,
+        fontWeight: 400,
+        lineHeight: '40px',
+        color: '#0b0c0f',
+        margin: 0,
+        marginBottom: 20,
+      }}>
+        Store Manager Dashboard — FreshMart Midtown
+      </h1>
     </div>
-
-    {/* AI narrative insight */}
-    <div
-      style={{
-        borderRadius: 8,
-        border: '1px solid rgba(93,54,255,0.18)',
-        backgroundColor: '#f6f3ff',
-        padding: '16px 20px',
-      }}
-    >
-      <div className="flex items-start gap-3">
-        <div
-          className="shrink-0 flex items-center justify-center"
-          style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg, #BA79EF, #470CED)', marginTop: 1 }}
-        >
-          <Zap size={13} className="text-white" />
-        </div>
-        <p style={{
-          fontFamily: '"72","72full",Arial,Helvetica,sans-serif',
-          fontSize: 14,
-          fontWeight: 400,
-          lineHeight: '22px',
-          color: '#353c4a',
-          margin: 0,
-        }}>
-          <strong style={{ color: '#0b0c0f', fontWeight: 600 }}>3 critical stock issues</strong> need action before the lunch rush in ~18 minutes — Strawberry, Avocado, and Baby Spinach. Jordan and Sam are already working two of them. Alex T. has 0 completions this shift; consider redirecting to Baby Spinach reorder.
-        </p>
-      </div>
-    </div>
+    <CommandCenter associates={associates} onAddTask={onAddTask} />
   </div>
 );
 
@@ -1019,7 +1356,311 @@ const EmployeeTaskColumn = ({ employee }: { employee: EmployeeColumn }) => {
   );
 };
 
-const TaskBoardSection = ({ taskBoard }: { taskBoard: EmployeeColumn[] }) => {
+/* ══════════════════════════════════════════════════════
+   PRODUCT → SHELF LOOKUP  (autocomplete data)
+══════════════════════════════════════════════════════ */
+const PRODUCT_SHELF_MAP: { product: string; shelf: string; zone: string }[] = [
+  { product: "Organic Strawberries",   shelf: "Shelf 3A", zone: "Zone A" },
+  { product: "Hass Avocado",           shelf: "Shelf 2A", zone: "Zone B" },
+  { product: "Baby Spinach",           shelf: "Shelf 4C", zone: "Zone C" },
+  { product: "Organic Bananas",        shelf: "Shelf 1A", zone: "Zone A" },
+  { product: "Cherry Tomatoes",        shelf: "Shelf 2C", zone: "Zone C" },
+  { product: "Heirloom Tomatoes",      shelf: "Shelf 4A", zone: "Zone C" },
+  { product: "Greek Yogurt",           shelf: "Shelf 2B", zone: "Zone B" },
+  { product: "Blackberries",           shelf: "Shelf 3C", zone: "Zone C" },
+  { product: "Blueberries",            shelf: "Shelf 3B", zone: "Zone B" },
+  { product: "Romaine Lettuce",        shelf: "Shelf 1C", zone: "Zone C" },
+  { product: "Whole Milk",             shelf: "Shelf 1B", zone: "Zone B" },
+  { product: "Orange Juice",           shelf: "Shelf 2A", zone: "Zone A" },
+  { product: "Bottled Water",          shelf: "Shelf 5A", zone: "Zone A" },
+  { product: "Sparkling Water",        shelf: "Shelf 5B", zone: "Zone A" },
+  { product: "Cheddar Cheese",         shelf: "Shelf 3B", zone: "Zone B" },
+  { product: "Sourdough Bread",        shelf: "Shelf 1D", zone: "Zone D" },
+  { product: "Eggs (dozen)",           shelf: "Shelf 4B", zone: "Zone B" },
+  { product: "Butter",                 shelf: "Shelf 4B", zone: "Zone B" },
+  { product: "Sunscreen SPF 50",       shelf: "Shelf 2D", zone: "Zone D" },
+  { product: "Sparkling Lemonade",     shelf: "Shelf 5C", zone: "Zone C" },
+];
+
+/* ══════════════════════════════════════════════════════
+   ADD TASK MODAL
+══════════════════════════════════════════════════════ */
+const AddTaskModal = ({
+  employees,
+  onClose,
+  onAdd,
+  prefillTitle = "",
+  prefillNote = "",
+}: {
+  employees: EmployeeColumn[];
+  onClose: () => void;
+  onAdd: (task: EmployeeTask, employeeId: string) => void;
+  prefillTitle?: string;
+  prefillNote?: string;
+}) => {
+  const ff = '"72","72full",Arial,Helvetica,sans-serif';
+  const [title, setTitle]           = useState(prefillTitle);
+  const [product, setProduct]       = useState("");
+  const [location, setLocation]     = useState("");
+  const [locationAutoFilled, setLocationAutoFilled] = useState(false);
+  const [shelfSuggestion, setShelfSuggestion] = useState<{ product: string; shelf: string; zone: string } | null>(null);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [priority, setPriority]     = useState<TaskPriority>("Medium");
+  const [assigneeId, setAssigneeId] = useState(employees[0]?.id ?? "");
+  const [submitted, setSubmitted]   = useState(false);
+
+  const filteredSuggestions = product.length >= 2
+    ? PRODUCT_SHELF_MAP.filter(p => p.product.toLowerCase().includes(product.toLowerCase()))
+    : [];
+
+  const handleProductChange = (val: string) => {
+    setProduct(val);
+    setShelfSuggestion(null);
+    setShowSuggestions(true);
+    // Clear auto-filled location if user edits the product
+    if (locationAutoFilled) {
+      setLocation("");
+      setLocationAutoFilled(false);
+    }
+  };
+
+  const selectSuggestion = (entry: typeof PRODUCT_SHELF_MAP[0]) => {
+    setProduct(entry.product);
+    setShelfSuggestion(entry);
+    setShowSuggestions(false);
+    // Pre-fill location
+    setLocation(`${entry.zone} · ${entry.shelf}`);
+    setLocationAutoFilled(true);
+    // auto-fill title if empty
+    if (!title) setTitle(`Restock ${entry.product}`);
+  };
+
+  const handleAdd = () => {
+    if (!title.trim()) return;
+    const zone = location.trim() || (shelfSuggestion
+      ? `${shelfSuggestion.zone} · ${shelfSuggestion.shelf}`
+      : product.trim() || "General");
+    const newTask: EmployeeTask = {
+      id: `t-${Date.now()}`,
+      title: title.trim(),
+      zone,
+      priority,
+      status: "To Do",
+      time: priority === "High" ? "Urgent" : undefined,
+    };
+    onAdd(newTask, assigneeId);
+    setSubmitted(true);
+    setTimeout(onClose, 900);
+  };
+
+  const urgencyOptions: { value: TaskPriority; label: string; color: string; bg: string }[] = [
+    { value: "High",   label: "High",   color: "#d9291c", bg: "#fff0f0" },
+    { value: "Medium", label: "Medium", color: "#e76500", bg: "#fff8f0" },
+    { value: "Low",    label: "Low",    color: "#198450", bg: "#f0fff5" },
+  ];
+
+  return (
+    /* Backdrop */
+    <div
+      style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(11,12,15,0.45)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      {/* Modal card */}
+      <div style={{ width: 480, backgroundColor: '#fff', borderRadius: 12, boxShadow: '0 24px 48px rgba(0,0,0,0.18)', overflow: 'visible', position: 'relative' }}>
+
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px 16px', borderBottom: '1px solid #e6e7ea' }}>
+          <p style={{ fontFamily: ff, fontSize: 16, fontWeight: 600, color: '#0b0c0f', margin: 0 }}>Add Task</p>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#636d83', display: 'flex', alignItems: 'center' }}>
+            <X size={16} />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+
+          {/* Task title */}
+          <div>
+            <label style={{ fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#636d83', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.4px' }}>Task</label>
+            <input
+              autoFocus
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              placeholder="e.g. Restock Organic Strawberries"
+              style={{
+                width: '100%', boxSizing: 'border-box',
+                padding: '9px 12px', borderRadius: 8, border: '1.5px solid #b0b8c8',
+                fontFamily: ff, fontSize: 14, color: '#0b0c0f',
+                outline: 'none', backgroundColor: '#fdfeff',
+              }}
+              onFocus={e => { e.target.style.borderColor = '#0070f2'; }}
+              onBlur={e => { e.target.style.borderColor = '#b0b8c8'; }}
+            />
+          </div>
+
+          {/* Product + shelf suggestion */}
+          <div style={{ position: 'relative' }}>
+            <label style={{ fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#636d83', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.4px' }}>Product <span style={{ fontWeight: 400, color: '#9fa8b4' }}>(optional)</span></label>
+            <input
+              value={product}
+              onChange={e => handleProductChange(e.target.value)}
+              onFocus={e => { setShowSuggestions(true); e.currentTarget.style.borderColor = '#0070f2'; }}
+              onBlur={e => { e.currentTarget.style.borderColor = '#b0b8c8'; setTimeout(() => setShowSuggestions(false), 150); }}
+              placeholder="Start typing a product name…"
+              style={{
+                width: '100%', boxSizing: 'border-box',
+                padding: '9px 12px', borderRadius: 8, border: '1.5px solid #b0b8c8',
+                fontFamily: ff, fontSize: 14, color: '#0b0c0f',
+                outline: 'none', backgroundColor: '#fdfeff',
+              }}
+            />
+
+            {/* Autocomplete dropdown */}
+            {showSuggestions && filteredSuggestions.length > 0 && (
+              <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 10, backgroundColor: '#fff', border: '1px solid #e6e7ea', borderRadius: 8, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', marginTop: 4, overflow: 'hidden' }}>
+                {filteredSuggestions.slice(0, 6).map((entry, i) => (
+                  <button
+                    key={i}
+                    onMouseDown={() => selectSuggestion(entry)}
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '10px 14px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', borderBottom: i < Math.min(filteredSuggestions.length, 6) - 1 ? '1px solid #f0f2f4' : 'none' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#f5f7ff'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent'; }}
+                  >
+                    <span style={{ fontFamily: ff, fontSize: 14, color: '#0b0c0f' }}>{entry.product}</span>
+                    <span style={{ fontFamily: ff, fontSize: 12, color: '#0070f2', fontWeight: 600, backgroundColor: '#e8f0fd', padding: '2px 8px', borderRadius: 4 }}>
+                      {entry.zone} · {entry.shelf}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Location — empty by default, pre-filled when product is selected */}
+          <div>
+            <label style={{ fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#636d83', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.4px' }}>
+              Location
+              {locationAutoFilled && (
+                <span style={{ fontWeight: 400, color: '#0070f2', marginLeft: 8, textTransform: 'none', letterSpacing: 0 }}>
+                  <MapPin size={10} style={{ display: 'inline', marginRight: 3, verticalAlign: 'middle' }} />
+                  auto-filled
+                </span>
+              )}
+            </label>
+            <input
+              value={location}
+              onChange={e => { setLocation(e.target.value); setLocationAutoFilled(false); }}
+              onFocus={e => e.currentTarget.style.borderColor = '#0070f2'}
+              onBlur={e => e.currentTarget.style.borderColor = locationAutoFilled ? '#0070f2' : '#b0b8c8'}
+              placeholder="e.g. Zone A · Shelf 3A"
+              style={{
+                width: '100%', boxSizing: 'border-box',
+                padding: '9px 12px', borderRadius: 8,
+                border: `1.5px solid ${locationAutoFilled ? '#0070f2' : '#b0b8c8'}`,
+                fontFamily: ff, fontSize: 14, color: '#0b0c0f',
+                outline: 'none',
+                backgroundColor: locationAutoFilled ? '#f0f6ff' : '#fdfeff',
+                transition: 'border-color 0.15s, background-color 0.15s',
+              }}
+            />
+          </div>
+
+          {/* AI suggested action note — shown when pre-filled from AI Priorities */}
+          {prefillNote && (
+            <div style={{ display: 'flex', gap: 8, padding: '10px 12px', borderRadius: 8, backgroundColor: '#f6f3ff', border: '1px solid rgba(93,54,255,0.15)' }}>
+              <Zap size={13} style={{ color: '#552cff', flexShrink: 0, marginTop: 1 }} />
+              <p style={{ fontFamily: ff, fontSize: 12, color: '#353c4a', margin: 0, lineHeight: '18px' }}>
+                <strong style={{ color: '#552cff' }}>AI suggests: </strong>{prefillNote}
+              </p>
+            </div>
+          )}
+
+          {/* Urgency */}
+          <div>
+            <label style={{ fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#636d83', display: 'block', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.4px' }}>Urgency</label>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {urgencyOptions.map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => setPriority(opt.value)}
+                  style={{
+                    flex: 1, padding: '8px 0', borderRadius: 8, cursor: 'pointer',
+                    border: priority === opt.value ? `2px solid ${opt.color}` : '1.5px solid #e6e7ea',
+                    backgroundColor: priority === opt.value ? opt.bg : '#fff',
+                    fontFamily: ff, fontSize: 13, fontWeight: 600,
+                    color: priority === opt.value ? opt.color : '#636d83',
+                    transition: 'all 0.12s',
+                  }}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Assign to */}
+          <div>
+            <label style={{ fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#636d83', display: 'block', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.4px' }}>Assign to</label>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {employees.map(emp => {
+                const isSelected = assigneeId === emp.id;
+                return (
+                  <button
+                    key={emp.id}
+                    onClick={() => setAssigneeId(emp.id)}
+                    style={{
+                      flex: 1, padding: '8px 6px', borderRadius: 8, cursor: 'pointer',
+                      border: isSelected ? '2px solid #0070f2' : '1.5px solid #e6e7ea',
+                      backgroundColor: isSelected ? '#e8f0fd' : '#fff',
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                      transition: 'all 0.12s',
+                    }}
+                  >
+                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'linear-gradient(135deg,#8A48E6,#470CED)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontFamily: ff, fontSize: 11, fontWeight: 600, color: '#fff' }}>{emp.initials}</span>
+                    </div>
+                    <span style={{ fontFamily: ff, fontSize: 11, fontWeight: isSelected ? 600 : 400, color: isSelected ? '#0057d2' : '#0b0c0f' }}>{emp.name.split(' ')[0]}</span>
+                    <span style={{ fontFamily: ff, fontSize: 10, color: '#636d83' }}>{emp.role}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', padding: '14px 24px 20px', borderTop: '1px solid #e6e7ea' }}>
+          <button
+            onClick={onClose}
+            style={{ padding: '8px 18px', borderRadius: 8, border: '1px solid #e6e7ea', backgroundColor: '#fff', fontFamily: ff, fontSize: 14, fontWeight: 600, color: '#636d83', cursor: 'pointer' }}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleAdd}
+            disabled={!title.trim() || submitted}
+            style={{
+              padding: '8px 20px', borderRadius: 8, border: 'none',
+              backgroundColor: submitted ? '#198450' : (!title.trim() ? '#b0b8c8' : '#0070f2'),
+              fontFamily: ff, fontSize: 14, fontWeight: 600, color: '#fff',
+              cursor: title.trim() && !submitted ? 'pointer' : 'default',
+              display: 'flex', alignItems: 'center', gap: 6, transition: 'background 0.2s',
+            }}
+          >
+            {submitted ? <><CheckCircle2 size={14} /> Added!</> : '+ Add Task'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ══════════════════════════════════════════════════════
+   TASK BOARD SECTION
+══════════════════════════════════════════════════════ */
+const TaskBoardSection = ({ taskBoard, onAddTask }: { taskBoard: EmployeeColumn[]; onAddTask: (task: EmployeeTask, employeeId: string) => void }) => {
+  const [showAddTask, setShowAddTask] = useState(false);
+
   const totalOpen = taskBoard.flatMap(e => e.tasks).filter(t => t.status !== "Done").length;
   const totalDone = taskBoard.flatMap(e => e.tasks).filter(t => t.status === "Done").length;
 
@@ -1034,15 +1675,16 @@ const TaskBoardSection = ({ taskBoard }: { taskBoard: EmployeeColumn[] }) => {
           </p>
         </div>
         <button
+          onClick={() => setShowAddTask(true)}
           style={{
-            padding: '7px 14px', borderRadius: 6,
-            border: '1px solid #e6e7ea', backgroundColor: '#ffffff',
+            padding: '8px 16px', borderRadius: 8,
+            border: 'none', backgroundColor: '#0070f2',
             fontFamily: '"72","72full",Arial,Helvetica,sans-serif',
-            fontSize: 13, fontWeight: 600, color: '#0b0c0f',
-            cursor: 'pointer',
+            fontSize: 13, fontWeight: 600, color: '#fff',
+            cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6,
           }}
         >
-          + Add Task
+          <Plus size={14} /> Add Task
         </button>
       </div>
 
@@ -1050,6 +1692,15 @@ const TaskBoardSection = ({ taskBoard }: { taskBoard: EmployeeColumn[] }) => {
       <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
         {taskBoard.map(emp => <EmployeeTaskColumn key={emp.id} employee={emp} />)}
       </div>
+
+      {/* Add Task Modal */}
+      {showAddTask && (
+        <AddTaskModal
+          employees={taskBoard}
+          onClose={() => setShowAddTask(false)}
+          onAdd={onAddTask}
+        />
+      )}
     </div>
   );
 };
@@ -1284,11 +1935,80 @@ const FloorplanSection = () => {
 ══════════════════════════════════════════════════════ */
 const StoreManagerSpacePage = () => {
   const [alerts, setAlerts] = useState<StoreAlert[]>(initialAlerts);
-  const [taskBoard]         = useState<EmployeeColumn[]>(initialTaskBoard);
+  const [taskBoard, setTaskBoard] = useState<EmployeeColumn[]>(initialTaskBoard);
+
+  // Alex sign-off flow
+  const [alexSignedOff, setAlexSignedOff]       = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
+  const [triggerChat, setTriggerChat]           = useState(false);
+  const [reassigned, setReassigned]             = useState(false);
+
+  // Simulate Alex signing off after 4s
+  useEffect(() => {
+    const t = setTimeout(() => setShowNotification(true), 4000);
+    return () => clearTimeout(t);
+  }, []);
+
+  // When notification shown → trigger chat after 2s
+  useEffect(() => {
+    if (!showNotification) return;
+    setAlexSignedOff(true);
+    const t = setTimeout(() => setTriggerChat(true), 2000);
+    return () => clearTimeout(t);
+  }, [showNotification]);
+
+  const handleReassignConfirmed = () => {
+    if (reassigned) return;
+    setReassigned(true);
+
+    // Move Alex's tasks to Jordan and Sam per REASSIGN_PLAN
+    setTaskBoard(prev => prev.map(emp => {
+      if (emp.id === "alex") {
+        // Mark Alex's tasks as reassigned (strike through / done-ish)
+        return {
+          ...emp,
+          floorStatus: "Break" as const,
+          tasks: emp.tasks.map(t => ({ ...t, status: "Done" as const, time: "Reassigned" })),
+        };
+      }
+      if (emp.id === "jordan") {
+        return {
+          ...emp,
+          tasks: [
+            { id: `t-alex-1`, title: "Submit reorder for Baby Spinach", zone: "Zone C", priority: "High" as const, status: "To Do" as const, time: "Urgent" },
+            ...emp.tasks,
+          ],
+        };
+      }
+      if (emp.id === "sam") {
+        return {
+          ...emp,
+          tasks: [
+            { id: `t-alex-2`, title: "Apply markdown — Heirloom Tomatoes", zone: "Zone C · Shelf 4A", priority: "Medium" as const, status: "To Do" as const },
+            { id: `t-alex-3`, title: "Cull damaged blackberries", zone: "Zone C", priority: "Medium" as const, status: "To Do" as const },
+            ...emp.tasks,
+          ],
+        };
+      }
+      return emp;
+    }));
+
+    // Toasts
+    setTimeout(() => toast.success("Task assigned to Jordan M. — Submit reorder for Baby Spinach"), 200);
+    setTimeout(() => toast.success("Task assigned to Sam K. — Apply markdown — Heirloom Tomatoes"), 600);
+    setTimeout(() => toast.success("Task assigned to Sam K. — Cull damaged blackberries"), 1000);
+  };
 
   const handleAssign = (id: string, name: string) => {
     setAlerts(prev => prev.map(a => a.id === id ? { ...a, assignee: name, status: "In Progress" } : a));
     toast.success(`Assigned to ${name}`);
+  };
+
+  const handleAddTask = (task: EmployeeTask, employeeId: string) => {
+    setTaskBoard(prev => prev.map(emp =>
+      emp.id === employeeId ? { ...emp, tasks: [task, ...emp.tasks] } : emp
+    ));
+    toast.success("Task added to board");
   };
 
   return (
@@ -1304,15 +2024,49 @@ const StoreManagerSpacePage = () => {
       >
         <SpaceHeader />
 
+        {/* ── Alex sign-off notification banner ── */}
+        {showNotification && !reassigned && (
+          <div
+            style={{
+              margin: '0 24px 0',
+              padding: '12px 16px',
+              borderRadius: 10,
+              backgroundColor: '#fff8e1',
+              border: '1.5px solid #f9a825',
+              display: 'flex', alignItems: 'center', gap: 12,
+              animation: 'fade-in-up 0.35s ease-out both',
+              position: 'relative', zIndex: 20,
+            }}
+          >
+            <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'linear-gradient(135deg,#8A48E6,#470CED)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <span style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#fff' }}>AT</span>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#5d4037', margin: 0 }}>
+                Alex T. has signed off
+              </p>
+              <p style={{ fontFamily: ff, fontSize: 12, color: '#795548', margin: '2px 0 0' }}>
+                3 open tasks in Zone C need reassignment · Joule is preparing a plan
+              </p>
+            </div>
+            <button
+              onClick={() => setShowNotification(false)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#795548', padding: 4, flexShrink: 0, display: 'flex' }}
+            >
+              <X size={16} />
+            </button>
+          </div>
+        )}
+
         <div className="flex-1 overflow-y-auto">
           {/* 1. Personalized My Day */}
-          <MyDaySection />
+          <MyDaySection associates={initialAssociates} onAddTask={handleAddTask} />
 
           {/* Divider */}
           <div style={{ margin: '40px 80px 0', height: 1, backgroundColor: '#e6e7ea' }} />
 
           {/* 2. Task Board */}
-          <TaskBoardSection taskBoard={taskBoard} />
+          <TaskBoardSection taskBoard={taskBoard} onAddTask={handleAddTask} />
 
           {/* Divider */}
           <div style={{ margin: '0 80px', height: 1, backgroundColor: '#e6e7ea' }} />
@@ -1324,7 +2078,12 @@ const StoreManagerSpacePage = () => {
 
       {/* ── Right Chat Pane — Figma: 508px, #f8f9fa ── */}
       <div style={{ width: 508, flexShrink: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <SpaceChatPanel alerts={alerts} onAssign={handleAssign} />
+        <SpaceChatPanel
+          alerts={alerts}
+          onAssign={handleAssign}
+          onReassignConfirmed={handleReassignConfirmed}
+          triggerAlexSignoff={triggerChat}
+        />
       </div>
     </div>
   );
