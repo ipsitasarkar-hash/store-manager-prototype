@@ -27,6 +27,8 @@ interface StoreAlert {
   assignee: string | null;
   status: TaskStatus;
   detail: string;
+  recommendation: string;
+  suggestedTask: string;
 }
 
 interface Associate {
@@ -53,6 +55,8 @@ const initialAlerts: StoreAlert[] = [
     assignee: "Jordan M.",
     status: "In Progress",
     detail: "Last scanned 3h ago. Back stock: 6 units. Jordan M. assigned to restock.",
+    recommendation: "Pull 6 units from back stock immediately. Place full case on Shelf 3A. Check scan-in status after restocking.",
+    suggestedTask: "Restock Organic Strawberries — pull 6 units to Shelf 3A",
   },
   {
     id: "ALT-002",
@@ -64,6 +68,8 @@ const initialAlerts: StoreAlert[] = [
     assignee: "Sam K.",
     status: "Open",
     detail: "Sales velocity high. Back stock: 18 units. Expires in 2 days — margin risk if unsold.",
+    recommendation: "Restock full case (18 units) to shelf now. Apply 'Buy 2 Get 1' promo tag to clear expiring stock before loss.",
+    suggestedTask: "Restock Avocados + apply promo tag — Shelf 2B (18 units, exp. 2 days)",
   },
   {
     id: "ALT-003",
@@ -75,6 +81,8 @@ const initialAlerts: StoreAlert[] = [
     assignee: null,
     status: "Open",
     detail: "6 units on shelf. Back stock depleted. At current velocity, stock-out at 12:15 PM with no recovery.",
+    recommendation: "Submit emergency reorder via supplier portal now. Estimated earliest delivery: tomorrow AM. Place 'Limited Stock' sign on shelf.",
+    suggestedTask: "Submit emergency reorder for Baby Spinach 5oz — stock-out predicted 12:15 PM",
   },
   {
     id: "ALT-004",
@@ -86,6 +94,8 @@ const initialAlerts: StoreAlert[] = [
     assignee: "Jordan M.",
     status: "In Progress",
     detail: "12 units remaining. Back stock: 24 units. Jordan M. pulling half-case now.",
+    recommendation: "Pull full case (24 units) — half-case won't last past lunch rush. Stage second case in back room for rapid replenishment.",
+    suggestedTask: "Pull full case of Organic Bananas to Shelf 1A — stage backup in back room",
   },
   {
     id: "ALT-005",
@@ -97,6 +107,8 @@ const initialAlerts: StoreAlert[] = [
     assignee: "Sam K.",
     status: "Open",
     detail: "14 items received at 9:15 AM. 3 items still unverified. Afternoon delivery arrives 11:30 AM — clear back room.",
+    recommendation: "Complete scan-in for remaining 3 items before 11:30 AM. Move verified stock to floor or cold storage to clear receiving area.",
+    suggestedTask: "Complete delivery verification — 3 unverified items before 11:30 AM",
   },
   {
     id: "ALT-006",
@@ -108,6 +120,8 @@ const initialAlerts: StoreAlert[] = [
     assignee: null,
     status: "Open",
     detail: "4 units on shelf, 6 in back. High margin item ($0.72). Apply 15% markdown to drive velocity.",
+    recommendation: "Apply 15% markdown sticker to all 10 units (shelf + back). Move back stock to front shelf for visibility. Log markdown in system.",
+    suggestedTask: "Apply 15% markdown to Heirloom Tomatoes — 10 units (shelf + back stock)",
   },
 ];
 
@@ -2153,34 +2167,93 @@ const SEVERITY_CFG: Record<AlertSeverity, { color: string; bg: string }> = {
   Resolved: { color: '#198450', bg: 'rgba(25,132,80,0.08)' },
 };
 
-const AlertsTab = ({ alerts, onAssign }: { alerts: StoreAlert[]; onAssign: (id: string, name: string) => void }) => {
+const AlertsTab = ({ alerts, onAddTask, taskBoard }: { alerts: StoreAlert[]; onAddTask: (task: EmployeeTask, employeeId: string) => void; taskBoard: EmployeeColumn[] }) => {
   const ff = '"72","72full",Arial,Helvetica,sans-serif';
-  const open    = alerts.filter(a => a.status !== 'Done');
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [modalAlert, setModalAlert] = useState<StoreAlert | null>(null);
+  const [acceptedIds, setAcceptedIds] = useState<Set<string>>(new Set());
+
+  const open     = alerts.filter(a => a.status !== 'Done');
   const resolved = alerts.filter(a => a.status === 'Done');
 
   const AlertRow = ({ a }: { a: StoreAlert }) => {
     const cfg = SEVERITY_CFG[a.severity];
+    const isExpanded = expandedId === a.id;
+    const isAccepted = acceptedIds.has(a.id);
+
     return (
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, padding: '14px 20px', borderBottom: '1px solid #f0f2f4' }}>
-        <span style={{ padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700, fontFamily: ff, flexShrink: 0, marginTop: 2, backgroundColor: cfg.bg, color: cfg.color }}>{a.severity}</span>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
-            <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 600, color: '#0b0c0f', margin: 0 }}>{a.product}</p>
-            <span style={{ fontFamily: ff, fontSize: 11, color: '#9fa8b4' }}>{a.zone} · {a.time}</span>
+      <div style={{ borderBottom: '1px solid #f0f2f4' }}>
+        {/* Row header — clickable */}
+        <div
+          onClick={() => setExpandedId(isExpanded ? null : a.id)}
+          style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 20px', cursor: 'pointer', backgroundColor: isExpanded ? '#fafbfc' : '#fff', transition: 'background 0.1s' }}
+        >
+          <span style={{ padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700, fontFamily: ff, flexShrink: 0, backgroundColor: cfg.bg, color: cfg.color }}>{a.severity}</span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+              <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 600, color: '#0b0c0f', margin: 0 }}>{a.product}</p>
+              <span style={{ fontFamily: ff, fontSize: 11, color: '#9fa8b4' }}>{a.zone} · {a.time}</span>
+            </div>
+            <p style={{ fontFamily: ff, fontSize: 12, color: '#556170', margin: '2px 0 0' }}>{a.issue}</p>
           </div>
-          <p style={{ fontFamily: ff, fontSize: 12, color: '#556170', margin: '3px 0 0' }}>{a.issue}</p>
-          <p style={{ fontFamily: ff, fontSize: 11, color: '#9fa8b4', margin: '3px 0 0' }}>{a.detail}</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+            {isAccepted && (
+              <span style={{ padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 600, fontFamily: ff, backgroundColor: 'rgba(25,132,80,0.08)', color: '#198450' }}>Task Added</span>
+            )}
+            {a.assignee && <span style={{ fontFamily: ff, fontSize: 11, color: '#9fa8b4' }}>{a.assignee}</span>}
+            <span style={{
+              padding: '2px 7px', borderRadius: 4, fontSize: 11, fontWeight: 600, fontFamily: ff,
+              backgroundColor: a.status === 'In Progress' ? 'rgba(0,112,242,0.08)' : 'rgba(231,101,0,0.08)',
+              color: a.status === 'In Progress' ? '#0070f2' : '#e76500',
+            }}>{a.status}</span>
+            <ChevronRight size={14} style={{ color: '#9fa8b4', transform: isExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }} />
+          </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-          {a.assignee && (
-            <span style={{ fontFamily: ff, fontSize: 11, color: '#556170', whiteSpace: 'nowrap' }}>→ {a.assignee}</span>
-          )}
-          <span style={{
-            padding: '3px 8px', borderRadius: 4, fontSize: 11, fontWeight: 600, fontFamily: ff,
-            backgroundColor: a.status === 'In Progress' ? 'rgba(0,112,242,0.08)' : a.status === 'Open' ? 'rgba(231,101,0,0.08)' : 'rgba(25,132,80,0.08)',
-            color: a.status === 'In Progress' ? '#0070f2' : a.status === 'Open' ? '#e76500' : '#198450',
-          }}>{a.status}</span>
-        </div>
+
+        {/* Expanded detail + recommendation */}
+        {isExpanded && (
+          <div style={{ padding: '0 20px 16px 20px', backgroundColor: '#fafbfc', borderTop: '1px solid #f0f2f4' }}>
+            {/* Detail */}
+            <div style={{ marginBottom: 12, paddingTop: 12 }}>
+              <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 700, color: '#636d83', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.4px' }}>What's happening</p>
+              <p style={{ fontFamily: ff, fontSize: 13, color: '#0b0c0f', margin: 0, lineHeight: '1.5' }}>{a.detail}</p>
+            </div>
+            {/* Joule recommendation */}
+            <div style={{ backgroundColor: '#f3efff', border: '1px solid #c5a9f5', borderRadius: 8, padding: '12px 14px', marginBottom: 14 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                <span style={{ fontSize: 13 }}>✦</span>
+                <span style={{ fontFamily: ff, fontSize: 11, fontWeight: 700, color: '#552cff', textTransform: 'uppercase', letterSpacing: '0.4px' }}>Joule's Recommendation</span>
+              </div>
+              <p style={{ fontFamily: ff, fontSize: 13, color: '#2d1f5e', margin: 0, lineHeight: '1.5' }}>{a.recommendation}</p>
+            </div>
+            {/* Actions */}
+            <div style={{ display: 'flex', gap: 8 }}>
+              {!isAccepted ? (
+                <button
+                  onClick={() => setModalAlert(a)}
+                  style={{
+                    padding: '8px 18px', borderRadius: 8, border: 'none',
+                    backgroundColor: '#0070f2', color: '#fff',
+                    fontFamily: ff, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', gap: 6,
+                  }}
+                >
+                  <CheckSquare size={14} /> Accept Suggestion
+                </button>
+              ) : (
+                <span style={{ fontFamily: ff, fontSize: 12, color: '#198450', display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <CheckCircle2 size={14} /> Task added to board
+                </span>
+              )}
+              <button
+                onClick={() => setExpandedId(null)}
+                style={{ padding: '8px 14px', borderRadius: 8, border: '1px solid #e6e7ea', background: '#fff', fontFamily: ff, fontSize: 13, color: '#556170', cursor: 'pointer' }}
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -2194,7 +2267,7 @@ const AlertsTab = ({ alerts, onAssign }: { alerts: StoreAlert[]; onAssign: (id: 
         <div style={{ padding: '12px 20px', borderBottom: '1px solid #f0f2f4', display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#d9291c', display: 'inline-block' }} />
           <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#0b0c0f', margin: 0, flex: 1 }}>Open Alerts</p>
-          <span style={{ fontFamily: ff, fontSize: 11, color: '#636d83' }}>{open.length} items</span>
+          <span style={{ fontFamily: ff, fontSize: 11, color: '#636d83' }}>{open.length} items — click to expand</span>
         </div>
         {open.map(a => <AlertRow key={a.id} a={a} />)}
         {open.length === 0 && (
@@ -2211,6 +2284,22 @@ const AlertsTab = ({ alerts, onAssign }: { alerts: StoreAlert[]; onAssign: (id: 
           </div>
           {resolved.map(a => <AlertRow key={a.id} a={a} />)}
         </div>
+      )}
+
+      {/* Prefilled task modal */}
+      {modalAlert && (
+        <AddTaskModal
+          employees={taskBoard}
+          prefillTitle={modalAlert.suggestedTask}
+          prefillNote={modalAlert.recommendation}
+          onClose={() => setModalAlert(null)}
+          onAdd={(task, empId) => {
+            onAddTask(task, empId);
+            setAcceptedIds(prev => new Set(prev).add(modalAlert.id));
+            setModalAlert(null);
+            toast.success('Task added to board');
+          }}
+        />
       )}
     </div>
   );
@@ -2445,7 +2534,7 @@ const StoreManagerSpacePage = () => {
           )}
 
           {activeTab === 'Alerts & Notifications' && (
-            <AlertsTab alerts={alerts} onAssign={handleAssign} />
+            <AlertsTab alerts={alerts} onAddTask={handleAddTask} taskBoard={taskBoard} />
           )}
 
           {activeTab === 'Team' && (
