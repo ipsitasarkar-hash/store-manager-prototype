@@ -1963,25 +1963,26 @@ const StoreManagerSpacePage = () => {
   const [alerts, setAlerts] = useState<StoreAlert[]>(initialAlerts);
   const [taskBoard, setTaskBoard] = useState<EmployeeColumn[]>(initialTaskBoard);
 
+  // Chat pane open/closed
+  const [chatOpen, setChatOpen] = useState(false);
+
   // Alex sign-off flow
-  const [alexSignedOff, setAlexSignedOff]       = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [triggerChat, setTriggerChat]           = useState(false);
   const [reassigned, setReassigned]             = useState(false);
 
-  // Simulate Alex signing off after 4s
+  // Notification appears after 15s
   useEffect(() => {
-    const t = setTimeout(() => setShowNotification(true), 4000);
+    const t = setTimeout(() => setShowNotification(true), 15000);
     return () => clearTimeout(t);
   }, []);
 
-  // When notification shown → trigger chat after 2s
-  useEffect(() => {
-    if (!showNotification) return;
-    setAlexSignedOff(true);
-    const t = setTimeout(() => setTriggerChat(true), 2000);
-    return () => clearTimeout(t);
-  }, [showNotification]);
+  // "View suggestions" CTA in notification → open chat + trigger Joule
+  const handleViewSuggestions = () => {
+    setShowNotification(false);
+    setChatOpen(true);
+    setTriggerChat(true);
+  };
 
   const handleReassignConfirmed = () => {
     if (reassigned) return;
@@ -2072,9 +2073,21 @@ const StoreManagerSpacePage = () => {
                 Alex T. has signed off
               </p>
               <p style={{ fontFamily: ff, fontSize: 12, color: '#795548', margin: '2px 0 0' }}>
-                3 open tasks in Zone C need reassignment · Joule is preparing a plan
+                3 open tasks in Zone C need reassignment
               </p>
             </div>
+            <button
+              onClick={handleViewSuggestions}
+              style={{
+                padding: '7px 14px', borderRadius: 7, border: 'none',
+                backgroundColor: '#5d36ff', color: '#fff',
+                fontFamily: ff, fontSize: 12, fontWeight: 600,
+                cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0,
+                display: 'flex', alignItems: 'center', gap: 5,
+              }}
+            >
+              <Zap size={12} /> View Joule's suggestions
+            </button>
             <button
               onClick={() => setShowNotification(false)}
               style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#795548', padding: 4, flexShrink: 0, display: 'flex' }}
@@ -2102,14 +2115,47 @@ const StoreManagerSpacePage = () => {
         </div>
       </div>
 
-      {/* ── Right Chat Pane — Figma: 508px, #f8f9fa ── */}
-      <div style={{ width: 508, flexShrink: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
-        <SpaceChatPanel
-          alerts={alerts}
-          onAssign={handleAssign}
-          onReassignConfirmed={handleReassignConfirmed}
-          triggerAlexSignoff={triggerChat}
-        />
+      {/* ── Right Chat Pane — collapses to a slim tab when closed ── */}
+      <div style={{
+        width: chatOpen ? 508 : 48,
+        flexShrink: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        transition: 'width 0.3s cubic-bezier(0.4,0,0.2,1)',
+        overflow: 'hidden',
+        borderLeft: '1px solid #e6e7ea',
+        backgroundColor: '#f8f9fa',
+        position: 'relative',
+      }}>
+        {/* Collapsed tab — visible when chat is closed */}
+        {!chatOpen && (
+          <button
+            onClick={() => setChatOpen(true)}
+            style={{
+              position: 'absolute', inset: 0, width: '100%', height: '100%',
+              background: 'none', border: 'none', cursor: 'pointer',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
+            }}
+          >
+            <ChatPaneIcon />
+            <span style={{
+              fontFamily: ff, fontSize: 11, fontWeight: 600, color: '#636d83',
+              writingMode: 'vertical-rl', textOrientation: 'mixed', transform: 'rotate(180deg)',
+              letterSpacing: '0.5px',
+            }}>Chat</span>
+          </button>
+        )}
+
+        {/* Full chat panel — rendered but hidden width when collapsed */}
+        <div style={{ width: 508, height: '100%', flexShrink: 0 }}>
+          <SpaceChatPanel
+            alerts={alerts}
+            onAssign={handleAssign}
+            onReassignConfirmed={handleReassignConfirmed}
+            triggerAlexSignoff={triggerChat}
+          />
+        </div>
       </div>
     </div>
   );
