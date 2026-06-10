@@ -318,70 +318,114 @@ const PRIORITY_CONFIG = {
 };
 
 const PriorityItem = ({ item, onAddTask }: { item: AIPriority; onAddTask: (task: EmployeeTask, employeeId: string) => void }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen]           = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [added, setAdded] = useState(false);
+  const [added, setAdded]         = useState(false);
+  const [dismissed, setDismissed] = useState(false);
   const cfg = PRIORITY_CONFIG[item.level];
-  const ff = '"72","72full",Arial,Helvetica,sans-serif';
+  const ff  = '"72","72full",Arial,Helvetica,sans-serif';
+
+  if (dismissed) return null;
 
   const handleAddedFromModal = (task: EmployeeTask, employeeId: string) => {
     onAddTask(task, employeeId);
     setAdded(true);
     setShowModal(false);
+    setOpen(false);
   };
 
   return (
     <>
       <div
-        style={{ borderRadius: 8, border: `1.5px solid ${open ? cfg.border : '#e6e7ea'}`, backgroundColor: open ? cfg.bg : '#fff', transition: 'all 0.15s', cursor: 'pointer' }}
-        onClick={() => setOpen(o => !o)}
+        style={{
+          borderRadius: 8,
+          border: `1.5px solid ${added ? cfg.border : open ? cfg.border : '#e6e7ea'}`,
+          backgroundColor: added ? cfg.bg : open ? cfg.bg : '#fff',
+          transition: 'all 0.15s',
+          opacity: added ? 0.75 : 1,
+        }}
       >
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '11px 14px' }}>
+        {/* ── Header row — always visible ── */}
+        <div
+          style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '11px 14px', cursor: 'pointer' }}
+          onClick={() => !added && setOpen(o => !o)}
+        >
           <span style={{ fontSize: 14, lineHeight: '20px', flexShrink: 0, marginTop: 1 }}>{cfg.emoji}</span>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 600, color: '#0b0c0f', margin: 0, lineHeight: '18px', flex: 1 }}>{item.what}</p>
-              {added && (
-                <span style={{ fontFamily: ff, fontSize: 11, fontWeight: 600, color: '#198450', backgroundColor: 'rgba(25,132,80,0.08)', padding: '2px 8px', borderRadius: 10, whiteSpace: 'nowrap', flexShrink: 0 }}>
-                  ✓ Added
-                </span>
-              )}
-            </div>
-            {open && (
-              <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <div style={{ display: 'flex', gap: 6 }}>
-                  <span style={{ fontFamily: ff, fontSize: 11, fontWeight: 700, color: '#636d83', flexShrink: 0, marginTop: 1 }}>WHY</span>
-                  <p style={{ fontFamily: ff, fontSize: 12, fontWeight: 400, color: '#353c4a', margin: 0, lineHeight: '18px' }}>{item.why}</p>
-                </div>
-                <div style={{ display: 'flex', gap: 6 }}>
-                  <span style={{ fontFamily: ff, fontSize: 11, fontWeight: 700, color: cfg.labelColor, flexShrink: 0, marginTop: 1 }}>DO</span>
-                  <p style={{ fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#0b0c0f', margin: 0, lineHeight: '18px' }}>{item.action}</p>
-                </div>
-                {/* Add to Task Board button */}
-                <div style={{ marginTop: 6 }}>
-                  <button
-                    onClick={e => { e.stopPropagation(); setShowModal(true); }}
-                    style={{
-                      padding: '6px 12px', borderRadius: 6, border: 'none',
-                      backgroundColor: added ? 'rgba(25,132,80,0.1)' : '#0070f2',
-                      color: added ? '#198450' : '#fff',
-                      fontFamily: ff, fontSize: 12, fontWeight: 600,
-                      cursor: added ? 'default' : 'pointer',
-                      display: 'inline-flex', alignItems: 'center', gap: 5,
-                      transition: 'background 0.15s',
-                    }}
-                    disabled={added}
-                  >
-                    {added ? <><CheckCircle2 size={12} /> Added to Task Board</> : <><Plus size={12} /> Add to Task Board</>}
-                  </button>
-                </div>
-              </div>
+            <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 600, color: '#0b0c0f', margin: 0, lineHeight: '18px' }}>{item.what}</p>
+          </div>
+
+          {/* Right-side: accepted badge OR accept pill + chevron */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, marginTop: 1 }}>
+            {added ? (
+              <span style={{ fontFamily: ff, fontSize: 11, fontWeight: 600, color: '#198450', backgroundColor: 'rgba(25,132,80,0.1)', padding: '2px 8px', borderRadius: 10, whiteSpace: 'nowrap' }}>
+                ✓ Accepted
+              </span>
+            ) : (
+              <>
+                <button
+                  onClick={e => { e.stopPropagation(); setShowModal(true); }}
+                  style={{
+                    padding: '3px 10px', borderRadius: 20, border: 'none',
+                    backgroundColor: cfg.border, color: '#fff',
+                    fontFamily: ff, fontSize: 11, fontWeight: 600,
+                    cursor: 'pointer', whiteSpace: 'nowrap',
+                    display: 'inline-flex', alignItems: 'center', gap: 4,
+                  }}
+                >
+                  <CheckSquare size={11} /> Accept
+                </button>
+                <ChevronDown
+                  size={14}
+                  style={{ color: '#636d83', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}
+                />
+              </>
             )}
           </div>
-          <ChevronDown size={14} style={{ color: '#636d83', flexShrink: 0, marginTop: 3, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }} />
         </div>
+
+        {/* ── Expanded detail ── */}
+        {open && !added && (
+          <div style={{ padding: '0 14px 14px', display: 'flex', flexDirection: 'column', gap: 8, borderTop: `1px solid ${cfg.border}22` }}>
+            <div style={{ display: 'flex', gap: 6, marginTop: 10 }}>
+              <span style={{ fontFamily: ff, fontSize: 11, fontWeight: 700, color: '#636d83', flexShrink: 0, marginTop: 1 }}>WHY</span>
+              <p style={{ fontFamily: ff, fontSize: 12, fontWeight: 400, color: '#353c4a', margin: 0, lineHeight: '18px' }}>{item.why}</p>
+            </div>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <span style={{ fontFamily: ff, fontSize: 11, fontWeight: 700, color: cfg.labelColor, flexShrink: 0, marginTop: 1 }}>DO</span>
+              <p style={{ fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#0b0c0f', margin: 0, lineHeight: '18px' }}>{item.action}</p>
+            </div>
+
+            {/* Action buttons */}
+            <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+              <button
+                onClick={e => { e.stopPropagation(); setShowModal(true); }}
+                style={{
+                  flex: 1, padding: '7px 0', borderRadius: 7, border: 'none',
+                  backgroundColor: cfg.border, color: '#fff',
+                  fontFamily: ff, fontSize: 12, fontWeight: 600,
+                  cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
+                }}
+              >
+                <CheckSquare size={12} /> Accept suggestion
+              </button>
+              <button
+                onClick={e => { e.stopPropagation(); setDismissed(true); }}
+                style={{
+                  padding: '7px 14px', borderRadius: 7,
+                  border: '1px solid #e6e7ea', backgroundColor: '#fff',
+                  fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#636d83',
+                  cursor: 'pointer',
+                }}
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
+      {/* Pre-filled confirmation modal */}
       {showModal && (
         <AddTaskModal
           employees={initialTaskBoard}
