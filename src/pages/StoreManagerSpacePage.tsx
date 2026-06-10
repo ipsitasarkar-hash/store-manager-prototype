@@ -355,31 +355,17 @@ const PriorityItem = ({ item, onAddTask }: { item: AIPriority; onAddTask: (task:
             <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 600, color: '#0b0c0f', margin: 0, lineHeight: '18px' }}>{item.what}</p>
           </div>
 
-          {/* Right-side: accepted badge OR accept pill + chevron */}
+          {/* Right-side: accepted badge OR chevron */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, marginTop: 1 }}>
             {added ? (
               <span style={{ fontFamily: ff, fontSize: 11, fontWeight: 600, color: '#198450', backgroundColor: 'rgba(25,132,80,0.1)', padding: '2px 8px', borderRadius: 10, whiteSpace: 'nowrap' }}>
                 ✓ Accepted
               </span>
             ) : (
-              <>
-                <button
-                  onClick={e => { e.stopPropagation(); setShowModal(true); }}
-                  style={{
-                    padding: '3px 10px', borderRadius: 20, border: 'none',
-                    backgroundColor: cfg.border, color: '#fff',
-                    fontFamily: ff, fontSize: 11, fontWeight: 600,
-                    cursor: 'pointer', whiteSpace: 'nowrap',
-                    display: 'inline-flex', alignItems: 'center', gap: 4,
-                  }}
-                >
-                  <CheckSquare size={11} /> Accept
-                </button>
-                <ChevronDown
-                  size={14}
-                  style={{ color: '#636d83', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}
-                />
-              </>
+              <ChevronDown
+                size={14}
+                style={{ color: '#636d83', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}
+              />
             )}
           </div>
         </div>
@@ -401,13 +387,13 @@ const PriorityItem = ({ item, onAddTask }: { item: AIPriority; onAddTask: (task:
               <button
                 onClick={e => { e.stopPropagation(); setShowModal(true); }}
                 style={{
-                  flex: 1, padding: '7px 0', borderRadius: 7, border: 'none',
-                  backgroundColor: cfg.border, color: '#fff',
-                  fontFamily: ff, fontSize: 12, fontWeight: 600,
+                  flex: 1, padding: '7px 0', borderRadius: 7,
+                  border: '1px solid #c8cdd4', backgroundColor: '#fff',
+                  fontFamily: ff, fontSize: 12, fontWeight: 600, color: '#0b0c0f',
                   cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5,
                 }}
               >
-                <CheckSquare size={12} /> Accept suggestion
+                <CheckSquare size={12} style={{ color: '#636d83' }} /> Accept suggestion
               </button>
               <button
                 onClick={e => { e.stopPropagation(); setDismissed(true); }}
