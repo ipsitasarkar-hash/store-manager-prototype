@@ -426,63 +426,91 @@ const CommandCenter = ({ associates, onAddTask }: { associates: Associate[]; onA
   const criticals    = AI_PRIORITIES.filter(p => p.level === 'critical');
   const importants   = AI_PRIORITIES.filter(p => p.level === 'important');
   const opportunities = AI_PRIORITIES.filter(p => p.level === 'opportunity');
+  const [showAlerts, setShowAlerts] = useState(false);
 
   const ff = '"72","72full",Arial,Helvetica,sans-serif';
 
   return (
     <div style={{ padding: '32px 80px 0' }}>
 
-      {/* ── Row 1: Store Health KPIs ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, marginBottom: 20 }}>
-        {[
-          { label: 'Store Health',    value: '74%',    sub: '↓ vs yesterday',  valueColor: '#e76500', subColor: '#e76500' },
-          { label: 'Open Alerts',     value: '5',      sub: '3 critical',      valueColor: '#d9291c', subColor: '#d9291c' },
-          { label: 'Tasks Complete',  value: '4 / 12', sub: '33% shift done',  valueColor: '#0b0c0f', subColor: '#636d83' },
-        ].map((kpi, i) => (
-          <div key={i} style={{ borderRadius: 8, border: '1px solid #e6e7ea', backgroundColor: '#fff', padding: '14px 16px' }}>
-            <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: '#636d83', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{kpi.label}</p>
-            <p style={{ fontFamily: ff, fontSize: 22, fontWeight: 700, color: kpi.valueColor, margin: '0 0 3px', lineHeight: 1 }}>{kpi.value}</p>
-            <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: kpi.subColor, margin: 0 }}>{kpi.sub}</p>
-          </div>
-        ))}
+      {/* ── Row 1: KPIs ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: 12, marginBottom: 20 }}>
+
+        {/* Open Alerts — clickable */}
+        <div
+          onClick={() => setShowAlerts(o => !o)}
+          style={{ borderRadius: 8, border: `1px solid ${showAlerts ? '#d9291c' : '#e6e7ea'}`, backgroundColor: showAlerts ? '#fff5f5' : '#fff', padding: '14px 16px', cursor: 'pointer', transition: 'all 0.15s' }}
+        >
+          <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: '#636d83', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Open Alerts</p>
+          <p style={{ fontFamily: ff, fontSize: 22, fontWeight: 700, color: '#d9291c', margin: '0 0 3px', lineHeight: 1 }}>5</p>
+          <p style={{ fontFamily: ff, fontSize: 11, color: '#d9291c', margin: 0 }}>3 critical ↓</p>
+        </div>
+
+        {/* Tasks Complete */}
+        <div style={{ borderRadius: 8, border: '1px solid #e6e7ea', backgroundColor: '#fff', padding: '14px 16px' }}>
+          <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: '#636d83', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Tasks Complete</p>
+          <p style={{ fontFamily: ff, fontSize: 22, fontWeight: 700, color: '#0b0c0f', margin: '0 0 3px', lineHeight: 1 }}>4 / 12</p>
+          <p style={{ fontFamily: ff, fontSize: 11, color: '#636d83', margin: 0 }}>33% shift done</p>
+        </div>
+
+        {/* Foot Traffic */}
+        <div style={{ borderRadius: 8, border: '1px solid #e6e7ea', backgroundColor: '#fff', padding: '14px 16px' }}>
+          <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: '#636d83', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Foot Traffic</p>
+          <p style={{ fontFamily: ff, fontSize: 22, fontWeight: 700, color: '#0070f2', margin: '0 0 3px', lineHeight: 1 }}>+18%</p>
+          <p style={{ fontFamily: ff, fontSize: 11, color: '#636d83', margin: 0 }}>by noon</p>
+        </div>
+
+        {/* Stock Risk */}
+        <div style={{ borderRadius: 8, border: '1px solid #e6e7ea', backgroundColor: '#fff', padding: '14px 16px' }}>
+          <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: '#636d83', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Stock Risk</p>
+          <p style={{ fontFamily: ff, fontSize: 22, fontWeight: 700, color: '#d9291c', margin: '0 0 3px', lineHeight: 1 }}>4</p>
+          <p style={{ fontFamily: ff, fontSize: 11, color: '#d9291c', margin: 0 }}>items &lt; 2 hrs</p>
+        </div>
+
+        {/* Staffing */}
+        <div style={{ borderRadius: 8, border: '1px solid #e6e7ea', backgroundColor: '#fff', padding: '14px 16px' }}>
+          <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: '#636d83', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Staffing</p>
+          <p style={{ fontFamily: ff, fontSize: 22, fontWeight: 700, color: '#e76500', margin: '0 0 3px', lineHeight: 1 }}>−2</p>
+          <p style={{ fontFamily: ff, fontSize: 11, color: '#e76500', margin: 0 }}>call-outs 5–7 PM</p>
+        </div>
+
+        {/* Next Delivery */}
+        <div style={{ borderRadius: 8, border: '1px solid #e6e7ea', backgroundColor: '#fff', padding: '14px 16px' }}>
+          <p style={{ fontFamily: ff, fontSize: 11, fontWeight: 400, color: '#636d83', margin: '0 0 6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Next Delivery</p>
+          <p style={{ fontFamily: ff, fontSize: 22, fontWeight: 700, color: '#0b0c0f', margin: '0 0 3px', lineHeight: 1 }}>11:30</p>
+          <p style={{ fontFamily: ff, fontSize: 11, color: '#636d83', margin: 0 }}>3 unverified items</p>
+        </div>
       </div>
 
-      {/* ── Row 2: Forecast + AI Priorities ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 16, marginBottom: 20 }}>
-
-        {/* Operational Risks — Figma card style */}
-        <div style={{ borderRadius: 16, backgroundColor: '#fefdff', border: '1px solid #e6e7ea', overflow: 'hidden' }}>
-          {/* Card header */}
-          <div style={{ padding: '16px 24px 8px' }}>
-            <p style={{ fontFamily: ff, fontSize: 16, fontWeight: 600, color: '#0f1115', margin: 0, lineHeight: '24px' }}>Operational Risks</p>
+      {/* ── Open Alerts flyout ── */}
+      {showAlerts && (
+        <div style={{ marginBottom: 20, borderRadius: 10, border: '1px solid #f5c2c2', backgroundColor: '#fff', overflow: 'hidden' }}>
+          <div style={{ padding: '12px 16px 8px', borderBottom: '1px solid #f0f2f4', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 700, color: '#d9291c', margin: 0 }}>Open Alerts</p>
+            <button onClick={() => setShowAlerts(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#636d83', display: 'flex', padding: 2 }}><X size={14} /></button>
           </div>
-          {/* Card items */}
-          <div style={{ padding: '6px 16px 16px', display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {[
-              { emoji: '⛅', label: 'Foot Traffic',  value: '+18% by noon',    note: 'Fri lunch peak + school out',        bg: '#d1efff', color: '#0070f2' },
-              { emoji: '📦', label: 'Stock Risk',    value: '4 items < 2 hrs', note: 'Strawberry, Avocado, Spinach, Water', bg: '#ffe0e0', color: '#d9291c' },
-              { emoji: '👥', label: 'Staffing',      value: '−2 associates',   note: 'Call-outs 5–7 PM window',            bg: '#fff0e0', color: '#e76500' },
-              { emoji: '🕐', label: 'Next Delivery', value: '11:30 AM',        note: '3 items still unverified',           bg: '#f0f2f4', color: '#636d83' },
-              { emoji: '💰', label: 'Margin at Risk',value: '~$68',            note: 'Tomato + Avocado expiry',            bg: '#fff0e0', color: '#e76500' },
-            ].map((row, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0' }}>
-                {/* Thumbnail */}
-                <div style={{ width: 30, height: 30, borderRadius: 20, backgroundColor: row.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 14 }}>
-                  {row.emoji}
-                </div>
-                {/* Text */}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {initialAlerts.filter(a => a.status !== 'Done').map((a, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderBottom: i < initialAlerts.filter(x => x.status !== 'Done').length - 1 ? '1px solid #f0f2f4' : 'none' }}>
+                <span style={{
+                  padding: '2px 8px', borderRadius: 4, fontSize: 11, fontWeight: 700, fontFamily: ff,
+                  backgroundColor: a.severity === 'Critical' ? 'rgba(217,41,28,0.08)' : 'rgba(231,101,0,0.08)',
+                  color: a.severity === 'Critical' ? '#d9291c' : '#e76500',
+                  flexShrink: 0,
+                }}>{a.severity}</span>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontFamily: ff, fontSize: 14, fontWeight: 600, color: '#0f1115', margin: 0, lineHeight: '20px' }}>
-                    {row.label} <span style={{ fontWeight: 700, color: row.color }}>{row.value}</span>
-                  </p>
-                  <p style={{ fontFamily: ff, fontSize: 14, fontWeight: 400, color: '#636d83', margin: 0, lineHeight: '20px', letterSpacing: '0.25px' }}>{row.note}</p>
+                  <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 600, color: '#0b0c0f', margin: 0 }}>{a.product}</p>
+                  <p style={{ fontFamily: ff, fontSize: 11, color: '#636d83', margin: '1px 0 0' }}>{a.issue}</p>
                 </div>
+                <span style={{ fontFamily: ff, fontSize: 11, color: '#636d83', flexShrink: 0 }}>{a.zone} · {a.time}</span>
               </div>
             ))}
           </div>
         </div>
+      )}
 
-        {/* AI Priorities */}
+      {/* ── Row 2: AI Priorities full width ── */}
+      <div style={{ marginBottom: 20 }}>
         <div style={{ borderRadius: 8, border: '1.5px solid rgba(93,54,255,0.2)', backgroundColor: '#fdfcff', padding: '16px 18px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
             <div style={{ width: 22, height: 22, borderRadius: '50%', background: 'linear-gradient(135deg,#BA79EF,#470CED)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -492,16 +520,25 @@ const CommandCenter = ({ associates, onAddTask }: { associates: Associate[]; onA
             <span style={{ marginLeft: 'auto', fontFamily: ff, fontSize: 11, color: '#636d83' }}>Click to expand</span>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {/* Critical group */}
-            <p style={{ fontFamily: ff, fontSize: 10, fontWeight: 700, color: '#d9291c', textTransform: 'uppercase', letterSpacing: '0.6px', margin: '4px 0 4px' }}>🔴 Critical</p>
-            {criticals.map((item, i) => <PriorityItem key={i} item={item} onAddTask={onAddTask} />)}
-
-            <p style={{ fontFamily: ff, fontSize: 10, fontWeight: 700, color: '#e76500', textTransform: 'uppercase', letterSpacing: '0.6px', margin: '8px 0 4px' }}>🟠 Important</p>
-            {importants.map((item, i) => <PriorityItem key={i} item={item} onAddTask={onAddTask} />)}
-
-            <p style={{ fontFamily: ff, fontSize: 10, fontWeight: 700, color: '#198450', textTransform: 'uppercase', letterSpacing: '0.6px', margin: '8px 0 4px' }}>🟢 Opportunity</p>
-            {opportunities.map((item, i) => <PriorityItem key={i} item={item} onAddTask={onAddTask} />)}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
+            <div>
+              <p style={{ fontFamily: ff, fontSize: 10, fontWeight: 700, color: '#d9291c', textTransform: 'uppercase', letterSpacing: '0.6px', margin: '0 0 4px' }}>🔴 Critical</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {criticals.map((item, i) => <PriorityItem key={i} item={item} onAddTask={onAddTask} />)}
+              </div>
+            </div>
+            <div>
+              <p style={{ fontFamily: ff, fontSize: 10, fontWeight: 700, color: '#e76500', textTransform: 'uppercase', letterSpacing: '0.6px', margin: '0 0 4px' }}>🟠 Important</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {importants.map((item, i) => <PriorityItem key={i} item={item} onAddTask={onAddTask} />)}
+              </div>
+            </div>
+            <div>
+              <p style={{ fontFamily: ff, fontSize: 10, fontWeight: 700, color: '#198450', textTransform: 'uppercase', letterSpacing: '0.6px', margin: '0 0 4px' }}>🟢 Opportunity</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                {opportunities.map((item, i) => <PriorityItem key={i} item={item} onAddTask={onAddTask} />)}
+              </div>
+            </div>
           </div>
         </div>
       </div>
