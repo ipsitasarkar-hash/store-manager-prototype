@@ -355,13 +355,9 @@ const PriorityItem = ({ item, onAddTask }: { item: AIPriority; onAddTask: (task:
             <p style={{ fontFamily: ff, fontSize: 13, fontWeight: 600, color: '#0b0c0f', margin: 0, lineHeight: '18px' }}>{item.what}</p>
           </div>
 
-          {/* Right-side: accepted badge OR chevron */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, marginTop: 1 }}>
-            {added ? (
-              <span style={{ fontFamily: ff, fontSize: 11, fontWeight: 600, color: '#198450', backgroundColor: 'rgba(25,132,80,0.1)', padding: '2px 8px', borderRadius: 10, whiteSpace: 'nowrap' }}>
-                ✓ Accepted
-              </span>
-            ) : (
+          {/* Right-side: chevron */}
+          <div style={{ display: 'flex', alignItems: 'center', flexShrink: 0, marginTop: 1 }}>
+            {!added && (
               <ChevronDown
                 size={14}
                 style={{ color: '#636d83', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.15s' }}
