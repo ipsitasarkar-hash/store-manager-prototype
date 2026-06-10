@@ -1186,7 +1186,7 @@ interface EmployeeColumn {
   name: string;
   initials: string;
   role: string;
-  floorStatus: "On Floor" | "Break" | "Back Room";
+  floorStatus: "On Floor" | "Break" | "Back Room" | "Signed Off";
   tasks: EmployeeTask[];
 }
 
@@ -1330,11 +1330,19 @@ const TaskCard = ({ task }: { task: EmployeeTask }) => {
   );
 };
 
+const PRESENCE_CONFIG: Record<EmployeeColumn["floorStatus"], { dot: string; label: string; labelColor: string; labelBg: string }> = {
+  "On Floor":   { dot: '#198450', label: 'On Floor',   labelColor: '#198450', labelBg: 'rgba(25,132,80,0.08)'   },
+  "Break":      { dot: '#e76500', label: 'On Break',   labelColor: '#e76500', labelBg: 'rgba(231,101,0,0.08)'   },
+  "Back Room":  { dot: '#0070f2', label: 'Back Room',  labelColor: '#0070f2', labelBg: 'rgba(0,112,242,0.08)'   },
+  "Signed Off": { dot: '#636d83', label: 'Signed Off', labelColor: '#636d83', labelBg: 'rgba(99,109,131,0.08)'  },
+};
+
 const EmployeeTaskColumn = ({ employee }: { employee: EmployeeColumn }) => {
   const done = employee.tasks.filter(t => t.status === "Done").length;
   const total = employee.tasks.length;
   const pct = Math.round((done / Math.max(1, total)) * 100);
-  const statusColor = employee.floorStatus === "On Floor" ? '#198450' : employee.floorStatus === "Break" ? '#e76500' : '#0070f2';
+  const presence = PRESENCE_CONFIG[employee.floorStatus];
+  const isSignedOff = employee.floorStatus === "Signed Off";
 
   return (
     <div
@@ -1342,8 +1350,8 @@ const EmployeeTaskColumn = ({ employee }: { employee: EmployeeColumn }) => {
         flex: '1 1 0',
         minWidth: 0,
         borderRadius: 8,
-        border: '1px solid #e6e7ea',
-        backgroundColor: '#ffffff',
+        border: `1px solid ${isSignedOff ? '#e6e7ea' : '#e6e7ea'}`,
+        backgroundColor: isSignedOff ? '#fafafa' : '#ffffff',
         padding: 16,
         display: 'flex',
         flexDirection: 'column',
@@ -1353,17 +1361,46 @@ const EmployeeTaskColumn = ({ employee }: { employee: EmployeeColumn }) => {
       {/* Column header */}
       <div>
         <div className="flex items-center gap-2 mb-2">
-          <div
-            className="flex items-center justify-center text-white shrink-0"
-            style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg, #8A48E6, #470CED)', fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 12, fontWeight: 600 }}
-          >
-            {employee.initials}
+          {/* Avatar with presence dot */}
+          <div style={{ position: 'relative', flexShrink: 0 }}>
+            <div
+              className="flex items-center justify-center text-white"
+              style={{
+                width: 32, height: 32, borderRadius: '50%',
+                background: isSignedOff
+                  ? '#c8cdd4'
+                  : 'linear-gradient(135deg, #8A48E6, #470CED)',
+                fontFamily: '"72","72full",Arial,Helvetica,sans-serif',
+                fontSize: 12, fontWeight: 600,
+                opacity: isSignedOff ? 0.6 : 1,
+              }}
+            >
+              {employee.initials}
+            </div>
+            {/* Presence dot */}
+            <span style={{
+              position: 'absolute', bottom: 0, right: 0,
+              width: 10, height: 10, borderRadius: '50%',
+              backgroundColor: presence.dot,
+              border: '2px solid #fff',
+              display: 'block',
+            }} />
           </div>
           <div className="flex-1 min-w-0">
-            <p style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 14, fontWeight: 600, color: '#0b0c0f', margin: 0 }}>{employee.name}</p>
+            <p style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 14, fontWeight: 600, color: isSignedOff ? '#636d83' : '#0b0c0f', margin: 0 }}>{employee.name}</p>
             <p style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 11, fontWeight: 400, color: '#636d83', margin: 0 }}>{employee.role}</p>
           </div>
-          <span style={{ fontFamily: '"72","72full",Arial,Helvetica,sans-serif', fontSize: 11, fontWeight: 600, color: statusColor }}>{employee.floorStatus}</span>
+          {/* Status pill */}
+          <span style={{
+            fontFamily: '"72","72full",Arial,Helvetica,sans-serif',
+            fontSize: 11, fontWeight: 600,
+            color: presence.labelColor,
+            backgroundColor: presence.labelBg,
+            padding: '2px 8px', borderRadius: 10,
+            whiteSpace: 'nowrap', flexShrink: 0,
+          }}>
+            {presence.label}
+          </span>
         </div>
         {/* Progress bar */}
         <div className="flex items-center gap-2">
@@ -1994,7 +2031,7 @@ const StoreManagerSpacePage = () => {
         // Mark Alex's tasks as reassigned (strike through / done-ish)
         return {
           ...emp,
-          floorStatus: "Break" as const,
+          floorStatus: "Signed Off" as const,
           tasks: emp.tasks.map(t => ({ ...t, status: "Done" as const, time: "Reassigned" })),
         };
       }
